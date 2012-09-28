@@ -91,7 +91,7 @@ def track_view(request):
         id=int(request.matchdict['id'])
     except:
         id=0
-    jsonlink='http://localhost:6543/json_track/%s/%s' % (action, id)
+    jsonlink='/json_track/%s/%s' % (action, id)
     return {
         'action': action,
         'id': id,
