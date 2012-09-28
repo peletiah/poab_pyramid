@@ -1,0 +1,59 @@
+.imagecontainer {
+  position: relative;
+}
+
+.imagecontainer img {
+    border-style: none;
+}
+.caption {
+  font-family: Arial,Helvetica;
+  position: absolute;
+  left:0; bottom:0;
+  z-index: 2;
+  width: 100%;
+  padding: 1em 0;
+  overflow: hidden;
+  background:url(/static/images/caption/black60.png);
+  behavior: url(/static/css/iepngfix.htc);
+  font-size: 0.7em;
+  display: block;
+  font-style: None;
+  color: #aaa;
+}
+.caption a,
+.caption span {
+  font-family: Arial,Helvetica;
+  color: #aaa;
+}
+.caption span {
+  padding-left: .5em;
+}
+.caption a:hover {
+  color: #fff;
+}
+.caption a span {
+  text-decoration: none;
+}
+
+.caption_right {
+    float:right;
+    padding: 0 10px 0 0;
+    width: 290px;
+    text-align: right;
+}
+.caption_center {
+    float:left;
+    padding: 0;
+    text-align: center;
+    width:370px;
+    margin: 0 auto;
+}
+.caption_center a {
+    text-decoration:none;
+}
+    
+.caption_left {
+    float:left;
+    padding: 0 0 0 10px;
+    width: 290px;
+}

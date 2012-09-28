@@ -1,0 +1,57 @@
+html, body, #mapdiv {
+                margin: 0;
+                width: 100%;
+                height: 100%;
+                font-size: 0.9em;
+                font-weight: normal;
+                font-family: trebuchet, "Lucida Sans Unicode", "Lucida Grande", verdana, arial,'Bitstream Vera Sans',helvetica,sans-serif;
+        }
+
+        .menu {
+            text-align:center;
+            position: absolute;
+            z-index: 20000;
+            margin: 0 10% 0 10%;
+            width: 80%;
+            Border: 0;
+            Vertical-align: baseline;
+}
+
+        .menu ul {
+            list-style: none;
+            padding: 0;
+            }
+
+        .menu li {
+            float: left;
+            margin-left: 0.2em;
+        }
+
+        .menu a {
+            color: #444444;
+            padding: 0.2em 0.5em 0.2em 0.5em;
+            text-decoration: none;
+            background: #DDDDDD;
+            padding: 0.2em 0.5em 0.2em 0.5em;
+            margin:0 0.1em;
+            -moz-border-radius: 5px;
+            -webkit-border-radius: 5px;
+            -khtml-border-radius: 5px;
+            opacity: 0.9;
+            border-radius: 5px;
+        }
+
+        .menu a:hover {
+                background: #00607f;
+                color: #FFFFFF;
+                text-decoration: bold;
+                 padding: 0.2em 0.5em 0.2em 0.5em;
+                margin:0 0.1em;
+                -moz-border-radius: 5px;
+                -webkit-border-radius: 5px;
+                -khtml-border-radius: 5px;
+                border-radius: 5px;
+                opacity: 0.9;
+        }
+
+
