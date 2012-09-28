@@ -38,6 +38,15 @@ from poab.models import (
 
 import re
 
+def fetch_images_for_trackpoints(q):
+    trackpoints = q.all()
+    trkpt_list=list()
+    for trackpoint in trackpoints:
+        trkpt_list.append(trackpoint.id)
+    q = DBSession.query(Imageinfo).filter(and_(Imageinfo.infomarker_id.in_(trkpt_list)))
+    images = q.order_by(asc(Imageinfo.flickrdatetaken)).all()
+    return images
+
 
 
 @view_config(
@@ -79,16 +88,15 @@ def view_view(request):
     #return { 'bla': log_count}
     if id==0:
         q = DBSession.query(Trackpoint).filter(Trackpoint.country_id!=None)
+        images=fetch_images_for_trackpoints(q)
     elif action=='c':
         q = DBSession.query(Trackpoint).filter(and_(Trackpoint.country_id==id))
+        images=fetch_images_for_trackpoints(q)
     elif action=='infomarker':
         q = DBSession.query(Trackpoint).filter(and_(Trackpoint.id==id))
-    trackpoints = q.all()
-    trkpt_list=list()
-    for trackpoint in trackpoints:
-        trkpt_list.append(trackpoint.id)
-    q = DBSession.query(Imageinfo).filter(and_(Imageinfo.infomarker_id.in_(trkpt_list)))
-    images = q.order_by(asc(Imageinfo.flickrdatetaken)).all()
+        images=fetch_images_for_trackpoints(q)
+    elif action=='id':
+        images = DBSession.query(Imageinfo).filter(Imageinfo.id==id).all()
     page_list=list()
     pages_list=list()
     i=0

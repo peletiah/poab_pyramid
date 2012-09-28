@@ -1,7 +1,7 @@
 *.py[co]
 
-development.ini
-production.ini
+*.ini
+*.ini
 
 # Packages
 *.egg
