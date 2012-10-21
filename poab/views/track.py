@@ -70,9 +70,18 @@ def json_track_view(request):
         infomarker = DBSession.query(Trackpoint).filter(Trackpoint.id==id).one()
         tracks = DBSession.query(Track).filter(Track.id==infomarker.track_id).all()
         response = Response(generate_json_from_tracks(tracks))
+    elif action=='fromgpx':
+        tracks = DBSession.query(Track).filter(Track.id==id).all()
+        response = Response(generate_json_from_tracks(tracks))
     elif action=='simple':
         trackpoint = DBSession.query(Trackpoint).filter(Trackpoint.id==id).one()
         response = Response(generate_json_from_trackpoint(trackpoint))
+    else:
+        after_date = datetime.datetime.strptime('2010-09-02',"%Y-%m-%d")
+        before_date = datetime.datetime.strptime('2010-12-07', "%Y-%m-%d")
+        curr_date = after_date
+        tracks = DBSession.query(Track).filter(and_(Track.date > after_date, Track.date < before_date)).all()
+        response = Response(generate_json_from_tracks(tracks))
     response.content_type = 'application/json'
     return(response)
 

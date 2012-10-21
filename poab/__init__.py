@@ -22,6 +22,8 @@ def main(global_config, **settings):
     config.add_route('json_track:action', '/json_track/{action}/{id}{imageid:.*}')
     config.add_route('about', '/about')
     config.add_route('test', '/test')
+    config.add_route('gpximport', '/gpximport')
+    config.add_route('gpxprocess', '/gpxprocess')
     config.add_route('test:action', '/test/{bla}/{blu}/{page}')
     config.scan()
     return config.make_wsgi_app()
