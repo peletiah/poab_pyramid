@@ -60,8 +60,12 @@ ${pages.pages()}
                     </h3>
                     <div class="logdetail_icons">
                         ${log.gallerylink | n}
-                        <span class="track_icon"><a title="Show route on map" rel="map_colorbox" href="/track/infomarker/${log.infomarkerid}"></a></span>
-                        <!--<span class="stats_icon"><a title="Show statistics for this day" href="/facts/stats/${log.infomarkerid}"></a></span>-->
+                        % if log.distance==None:
+                        
+                        % else:
+                            <span class="track_icon"><a title="Show route on map" rel="map_colorbox" href="/track/infomarker/${log.infomarkerid}"></a></span>
+                            <!--<span class="stats_icon"><a title="Show statistics for this day" href="/facts/stats/${log.infomarkerid}"></a></span>-->
+                        % endif
                     </div>
                     <div class="logtext">
                     ${log.content | n}

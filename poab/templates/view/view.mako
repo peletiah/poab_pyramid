@@ -55,6 +55,7 @@ ${pages.pages()}
 </div>
 % endfor
 
+<a name='bottom' href="#"></a>
 ${pages.pages()}
 
 

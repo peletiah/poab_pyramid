@@ -17,7 +17,7 @@
             kl_key='''<span class="page_arrow hoverhide"><a title="Use the h/l- and j/k-keys to navigate"><span class="keyboard-key">k</span> &#8593;</a></span><span class="page_arrow hoverhide"><a title="Use the h/l- and j/k-keys to navigate"><span class="keyboard-key">l</span> &#8594;</a></span>'''
             hj_key='''<span class="page_arrow hoverhide"><a title="Use the h/l- and j/k-keys to navigate"><span class="keyboard-key">j</span> &#8595;</a></span><span class="page_arrow hoverhide"><a title="Use the h/l- and j/k-keys to navigate"><span class="keyboard-key">h</span> &#8592;</a></span>'''
             prev_page='''<span class="page_arrow"><a class="prev_page" href="/%s/%s/%s/%s" title="older entries" ><span>older</span> &#8594;</a></span>'''% (controller,action_type,id1,str(curr_page-1))
-            next_page='''<span class="page_arrow"><a class="next_page" href="/%s/%s/%s/%s" title="newer entries" >&#8592; <span>newer</span></a></span>'''% (controller,action_type,id1,str(curr_page+1))
+            next_page='''<span class="page_arrow"><a class="next_page" href="/%s/%s/%s/%s#bottom" title="newer entries" >&#8592; <span>newer</span></a></span>'''% (controller,action_type,id1,str(curr_page+1))
              
             
             
