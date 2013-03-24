@@ -49,7 +49,7 @@ def get_logs_by_trackpoints(trackpoints):
     trkpt_list=list()
     for trackpoint in trackpoints:
         trkpt_list.append(trackpoint.id)
-    q = DBSession.query(Log).filter(and_(Log.infomarker_id.in_(trkpt_list)))
+    q = DBSession.query(Log).filter(and_(Log.infomarker_id.in_(trkpt_list),Log.id!=29))
     logs = q.order_by(asc(Log.createdate)).all()
     return logs
 
@@ -78,7 +78,7 @@ def log_view(request):
     except:
         page_number=None
     if id==0 and page_number==None:
-        q = DBSession.query(Log)#.filter(model.log.createdate>=older_createdate)
+        q = DBSession.query(Log).filter(Log.id!=29)
         log_count = q.count()
         page_fract=float(Fraction(str(log_count)+'/3'))
         if int(str(page_fract).split('.')[1])==0:
