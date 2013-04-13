@@ -8,11 +8,9 @@ html, body, #mapdiv {
         }
 
         .menu {
-            text-align:center;
             position: absolute;
             z-index: 20000;
-            margin: 0 10% 0 10%;
-            width: 80%;
+            width: 100%;
             Border: 0;
             Vertical-align: baseline;
 }
@@ -33,7 +31,6 @@ html, body, #mapdiv {
             text-decoration: none;
             background: #DDDDDD;
             padding: 0.2em 0.5em 0.2em 0.5em;
-            margin:0 0.1em;
             -moz-border-radius: 5px;
             -webkit-border-radius: 5px;
             -khtml-border-radius: 5px;
@@ -46,7 +43,6 @@ html, body, #mapdiv {
                 color: #FFFFFF;
                 text-decoration: bold;
                  padding: 0.2em 0.5em 0.2em 0.5em;
-                margin:0 0.1em;
                 -moz-border-radius: 5px;
                 -webkit-border-radius: 5px;
                 -khtml-border-radius: 5px;

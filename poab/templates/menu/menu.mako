@@ -74,28 +74,28 @@ function showSubcontent(contentlink) {
    });
     }
         </script>
-<div id="menublock">
-	<ul class="menucontent" class="clearfix">
-	    <li class="menuli"><a class="menu" href="/log">journal</a></li>
-	    <li class="menuli"><a class="menu" href="/view">photos</a></li>
-	    <li class="menuli"><a class="menu" href="/track">map</a></li>
-<!--	    <li class="menuli"><a class="menu" href="/facts">stats</a></li>-->
-	    <li class="menuli"><a class="menu" href="/about">about</a></li>
-<!--       <li class="navigation">
-         <ul>
-            <li class="navli">
-                <a href="#" title="Show all entries" onclick='resetContent();'>All</a>
+    <div id="menublock">
+    	<ul class="menucontent" class="clearfix">
+    	    <li class="menuli"><a href="/log">journal</a></li>
+    	    <li class="menuli"><a href="/view">photos</a></li>
+    	    <li class="menuli"><a href="/track">map</a></li>
+    <!--	    <li class="menuli"><a href="/facts">stats</a></li>-->
+    	    <li class="menuli"><a href="/about">about</a></li>
+    <!--       <li class="navigation">
+             <ul>
+                <li class="navli">
+                    <a href="#" title="Show all entries" onclick='resetContent();'>All</a>
+                </li>-->
+                 <!--<li class="navli">
+                    <a href="#" title="Show all entries" onclick='resetContent();'>justtesting</a>
+                </li>-->
+    <!--          </ul>
+            </li>
+    	    <li class="menu_nodecoration">
+                <a class="menu" href="http://poab.org/feed" target="_blank"><img src="/static/images/icons/rss.png" /></a>
             </li>-->
-             <!--<li class="navli">
-                <a href="#" title="Show all entries" onclick='resetContent();'>justtesting</a>
-            </li>-->
-<!--          </ul>
-        </li>
-	    <li class="menu_nodecoration">
-            <a class="menu" href="http://poab.org/feed" target="_blank"><img src="/static/images/icons/rss.png" /></a>
-        </li>-->
-	</ul>
-</div>
+    	</ul>
+    </div>
 <script type="text/javascript">
 markMenu();
 </script>

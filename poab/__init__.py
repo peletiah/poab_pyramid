@@ -25,6 +25,8 @@ def main(global_config, **settings):
     config.add_route('gpximport', '/gpximport')
     config.add_route('gpxprocess', '/gpxprocess')
     config.add_route('test:action', '/test/{bla}/{blu}/{page}')
+    config.add_route('sync', '/sync')
+    config.add_route('flickrauth', '/flickrauth')
     config.scan()
     return config.make_wsgi_app()
 

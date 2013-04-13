@@ -17,7 +17,7 @@ from poab.helpers.fractions import (
     Fraction
 )
 
-from poab.helpers.timediff import (
+from poab.helpers.timetools import (
     timediff
 )
 
@@ -139,7 +139,7 @@ def view_view(request):
                 self.shutter=shutter
                 self.focal_length=focal_length
                 self.iso=iso
-                #logdate=c.loginfo.createdate.strftime('%Y-%m-%d') #needed for the imagepath
+                #logdate=c.loginfo.created.strftime('%Y-%m-%d') #needed for the imagepath
                 self.trackpointinfo=trackpointinfo
                 self.localtime=localtime
                 self.timezone=timezone

@@ -50,7 +50,7 @@ def get_logs_by_trackpoints(trackpoints):
     for trackpoint in trackpoints:
         trkpt_list.append(trackpoint.id)
     q = DBSession.query(Log).filter(and_(Log.infomarker_id.in_(trkpt_list),Log.id!=29))
-    logs = q.order_by(asc(Log.createdate)).all()
+    logs = q.order_by(asc(Log.created)).all()
     return logs
 
 
@@ -149,9 +149,9 @@ def log_view(request):
         q = DBSession.query(Timezone).filter(Timezone.id==infomarker.timezone_id)
         try:
             timezone = q.one()
-            localtime=log.createdate+timezone.utcoffset
+            localtime=log.created+timezone.utcoffset
         except:
-            localtime=log.createdate
+            localtime=log.created
         # ###query for country and continent
         q = DBSession.query(Country).filter(Country.iso_numcode==infomarker.country_id)
         country=q.one()
@@ -192,7 +192,7 @@ def log_view(request):
                     self.topic=topic
                     self.twitter=twitter
                     self.guid=guid
-                    self.createdate=localtime.strftime('%B %d, %Y')
+                    self.created=localtime.strftime('%B %d, %Y')
                     self.content=content
                     try:
                         self.distance=rounded_distance

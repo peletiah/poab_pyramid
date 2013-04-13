@@ -13,8 +13,9 @@ from poab.models import (
     DBSession,
     Track,
     Trackpoint,
-    now
     )
+
+from poab.helpers import timetools
 
 from sqlalchemy import and_
 
@@ -74,7 +75,7 @@ def gpxprocess(request):
     
     reduced_trkpts=reduce_trackpoints(trkptlist)
     json_string=create_json_for_db(reduced_trkpts)
-    track=Track(now(),len(trkptlist),0,'00:00:00',None,None,None,None,None,None,None,json_string)
+    track=Track(timetools.now(),len(trkptlist),0,'00:00:00',None,None,None,None,None,None,None,json_string)
     DBSession.add(track)
     DBSession.flush()
     #raise HTTPFound(request.route_url('track','fromgpx',track.id))

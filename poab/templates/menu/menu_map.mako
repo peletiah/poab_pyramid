@@ -1,6 +1,7 @@
 <%namespace name="hostname" file="/misc/hostname.mako"/>
 <link rel="alternate" type="application/atom+xml" href="http://poab.org/feed" title="POAB.org - World Cycle Blog" />
 <link type="text/css" rel="Stylesheet" media="screen" href="/static/css/flora.datepicker.css"/>
+<link rel="stylesheet" type="text/css" href="/static/css/main.css" media="screen">
 <link rel="stylesheet" href="/static/css/jquery.autocomplete.css" type="text/css" />
 <link type="text/css" rel="Stylesheet" media="screen" href="/static/css/colorbox.css"/>
 <link href="/static/css/caption.css" media="screen" rel="stylesheet" title="" type="text/css"/>
@@ -74,6 +75,7 @@ function showSubcontent(contentlink) {
     }
         </script>
 <div class="menu">
+  <div id="menublock">
 	<ul>
 	    <li><a href="/log">journal</a></li>
 	    <li><a href="/view">photos</a></li>
@@ -81,6 +83,7 @@ function showSubcontent(contentlink) {
 <!--	    <li><a href="/facts">stats</a></li> -->
 	    <li><a href="/about">about</a></li>
 	</ul>
+  </div>
 </div>
 <script type="text/javascript">
 markMenu();

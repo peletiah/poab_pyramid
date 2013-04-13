@@ -7,8 +7,8 @@
 i=1
 %>
 
-<div class="subcontent">
-</div>
+<!--<div class="subcontent">
+</div>-->
 <div class="log" "clearfix">
 ${pages.pages()}
 
@@ -22,7 +22,7 @@ ${pages.pages()}
                     </div>
                     <% i=i+1 %>
                     <div class="logheader">
-                        <span class="logheader_left">${log.createdate}</span>
+                        <span class="logheader_left">${log.created}</span>
                         <span class="logheader_right"><a  rel="map_colorbox" href="/track/simple/${log.infomarkerid}" title="View location of this entry on a map">${log.location}</a></span>
                     </div>
                     <div class="twittercontent">
@@ -41,7 +41,7 @@ ${pages.pages()}
                     </div>
                 <% i=i+1 %>
                 <div class="logheader">
-                    <span class="logheader_left">${log.createdate}</span>
+                    <span class="logheader_left">${log.created}</span>
                     <span class="logheader_right"><a  rel="map_colorbox" href="/track/simple/${log.infomarkerid}" title="View location of this entry on a map">${log.location}</a></span>
                 </div>
                 <div class="logcontent">

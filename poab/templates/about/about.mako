@@ -22,6 +22,22 @@
         </div>
     </div>
     <div class="about">
+        <h1>About Daniela</h1>
+        <div class="aboutcontent">
+            <div class="about_images_right">
+                <img src="/static/images/about/daniela_colosseum_cropped_3.jpg" alt="Daniela with her camera in front of the Colosseum in Rome, Italy" />
+            </div>
+            <div class="about_text"><p>Als geborene Kärnterin bin ich nach meiner Matura nach Wien gezogen, um mein Architekturstudium von 2001-2009 an der TU Wien abzuschliessen. Seit drei Jahren übe ich den Beruf als Architektin in Wien aus.</p> 
+<p>Da ich schon lange nicht mehr länger auf Reisen war, der letzte lange Auslandsaufenthalt war 2008 ein Semster in Shanghai, freue ich mich schon wahnsinnig auf das nächste Abenteuer.</p>
+
+<p>Meine Motivation für die Reise ist in meinem Kopf frei zu werden. Vergangenes loszulassen und für die Gegenwart bereit zu sein. Der Alltag auf dem  Fahrrad ist so einfach, dass man sich auf das Wesentliche konzentrieren kann. Nämlich auf sich selbst und die Umwelt - die Umgebung und die Begegnungen mit voller Freude genießen zu können - neue Energie zu schöpfen und sich selbst besser kennenzulernen - an die Grenzen gehen, im Positiven und Negativen.</p>
+
+<p>Ich bin glücklich die Möglickeit zu erhalten, solch eine Reise zu machen. Einen Freund  zu haben, mit dem ich die Reise teilen kann.</p>
+            <p><small>Updated 24.March 2013</small></p>
+            </div>
+        </div>
+    </div>
+    <div class="about">
         <h1>About Christian</h1>
         <div class="aboutcontent">
             <div class="about_images">
@@ -41,6 +57,8 @@
             </div>
         </div>
     </div>
+
+
     <div class="about">
         <h1>About the website</h1>
         <div class="aboutcontent">
