@@ -27,6 +27,8 @@ def main(global_config, **settings):
     config.add_route('test:action', '/test/{bla}/{blu}/{page}')
     config.add_route('sync', '/sync')
     config.add_route('flickrauth', '/flickrauth')
+    config.add_route('feed', '/feed')
+    config.add_route('rss', '/rss')
     config.scan()
     return config.make_wsgi_app()
 

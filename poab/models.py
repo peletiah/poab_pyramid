@@ -384,6 +384,8 @@ class Trackpoint(Base):
     __tablename__ = 'trackpoint'
     id = Column("id", Integer, primary_key=True, autoincrement=True)
     track_id = Column("track_id", types.Integer, ForeignKey('track.id'))
+    timezone_id = Column("timezone_id", types.Integer, ForeignKey('timezone.id'))
+    country_id = Column("country_id", types.Integer, ForeignKey('country.iso_numcode'))
     latitude = Column("latitude", types.Numeric(9,7))
     longitude = Column("longitude", types.Numeric(10,7))
     altitude = Column("altitude", types.Integer)
@@ -392,9 +394,13 @@ class Trackpoint(Base):
     direction = Column("direction", types.Integer)
     pressure = Column("pressure", types.Integer)
     timestamp = Column("timestamp", types.TIMESTAMP(timezone=False))
+    infomarker = Column("infomarker", types.Boolean, default=False, nullable=False)
+    location = Column("location", types.VARCHAR(256))
 
-    def __init__(self, track_id, latitude, longitude, altitude, velocity, temperature, direction, pressure, timestamp):
+    def __init__(self, track_id, timezone_id, country_id, latitude, longitude, altitude, velocity, temperature, direction, pressure, timestamp, infomarker, location):
         self.track_id = track_id
+        self.timezone_id = timezone_id
+        self.country_id = country_id
         self.latitude = latitude
         self.longitude = longitude
         self.altitude = altitude
@@ -403,6 +409,9 @@ class Trackpoint(Base):
         self.direction = direction
         self.pressure = pressure
         self.timestamp = timestamp
+        self.infomarker = infomarker
+        self.location = location
+
 
 class Timezone(Base):
     __tablename__ = 'timezone'

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title type="text">poab.org - World Cycle Blog</title>
+  <subtitle type="html">
+    Travelling around the globe by bicycle
+  </subtitle>
+  <updated>2010-07-09T13:29:29Z</updated>
+  <id>http://poab.org/</id>
+  <link rel="alternate" type="text/html" 
+   hreflang="en" href="http://poab.org/"/>
+  <link rel="self" type="application/atom+xml" 
+   href="${request.route_url('feed')}"/>
+  <rights>Copyright (c) 2013, Christian Benke</rights>
+% for log in logdetaillist:
+  <entry>
+    % if log.twitter==True:
+        <title>${log.location}</title>
+    % else:
+        <title>${log.topic}</title>
+    % endif
+    <link rel="alternate" type="text/html" 
+     href="http://poab.org/log/id/${log.id}"/>
+    <id>http://poab.org/${log.id}</id>
+    <updated>${log.created}</updated>
+    <published>${log.created}</published>
+    <author>
+      <name>Christian Benke</name>
+      <uri>http://poab.org/</uri>
+    </author>
+    <content type="xhtml" xml:lang="en" 
+     xml:base="http://poab.org/">
+      <div xmlns="http://www.w3.org/1999/xhtml">
+        % if log.distance==None:
+            
+        % else:
+            <b>distance:</b> ${log.distance}<br />
+        % endif
+        % if log.timespan==None:
+        
+        % else:
+            <b>duration:</b> ${log.timespan}<br />
+        % endif
+            <br />
+            <br />            ${log.content | n}</div>
+    </content>
+  </entry>
+% endfor
+</feed>
+
+
