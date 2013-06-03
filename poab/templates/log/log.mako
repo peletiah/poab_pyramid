@@ -104,7 +104,7 @@ $("div.imagecontainer").mouseover(function(){
  }).mouseout(function(){
       $(".caption",this).hide();
     });
-showSubcontent('/misc/country_svg/'+${country_id});
+showSubcontent('/misc/country_svg/'+${country.iso_numcode});
 function captionSize(){
       width=($(".inlineimage").css("width"))
       $('div.imagecontainer').css({width: width});

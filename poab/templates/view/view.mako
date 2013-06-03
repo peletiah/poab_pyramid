@@ -17,11 +17,11 @@ ${pages.pages()}
 <div class="imagecontainer">
     <!--<a href="/view/id/${viewdetail.photoid}" title="View photo by itself"><img class="image" src="http://farm${viewdetail.flickrfarm}.static.flickr.com/${viewdetail.flickrserver}/${viewdetail.flickrphotoid}_${viewdetail.flickrsecret}_b.jpg" /></a>-->
     <!--<a rel="map_colorbox" href="/track/simple/${viewdetail.trackpointinfo.id}/${viewdetail.photoid}" title="View photolocation on map"><img class="image" src="http://farm${viewdetail.flickrfarm}.static.flickr.com/${viewdetail.flickrserver}/${viewdetail.flickrphotoid}_${viewdetail.flickrsecret}_b.jpg" /></a>-->
-    <a rel="map_colorbox" href="/track/simple/${viewdetail.trackpointinfo.id}/${viewdetail.photoid}" title="View photolocation on map"><img class="image" src="/static${viewdetail.imgname}" /></a>
+    <a rel="map_colorbox" href="/track/simple/${viewdetail.trackpointinfo.id}/${viewdetail.photoid}" title="View photolocation on map"><img class="image" src="/static${viewdetail.location}900/${viewdetail.name}" /></a>
     <div class="caption">
          <span class="caption_left">
             <span>&#8594;</span>
-            <a href="http://www.flickr.com/peletiah/${viewdetail.flickrphotoid}" target="_blank" title="View photo on flickr">www.flickr.com</a><br />
+            <a href="http://www.flickr.com/peletiah/${viewdetail.location}" target="_blank" title="View photo on flickr">www.flickr.com</a><br />
             <span>&#8594;</span>
             <a rel="map_colorbox" href="/track/simple/${viewdetail.trackpointinfo.id}/${viewdetail.photoid}" title="View photolocation on map">view on map</a>
         </span>

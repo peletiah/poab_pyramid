@@ -13,7 +13,10 @@ requires = [
     'pyramid_tm',
     'pyramid_debugtoolbar',
     'zope.sqlalchemy',
+    'pbkdf2',
     'waitress',
+    'flickrapi',
+    'markdown'
     ]
 
 setup(name='poab',

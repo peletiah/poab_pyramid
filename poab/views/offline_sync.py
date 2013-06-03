@@ -24,9 +24,11 @@ from decimal import Decimal, ROUND_HALF_UP
 from poab.models import (
     DBSession,
     Author,
+    Etappe,
     Log,
     Track,
     Trackpoint,
+    Location,
     Image,
     Imageinfo,
     Timezone,
@@ -44,64 +46,66 @@ from poab.helpers import (
     gpxtools
     )
 
-from datetime import datetime
-import uuid
+from datetime import datetime, timedelta
+import uuid, re
 
 @view_config(route_name='sync', request_param='type=status')
 def itemstatus(request):
-    filetype = request.POST.get('filetype')
-    metadata = json.loads(request.POST.get('metadata'))
-    if filetype == 'image':
-        image = Image.get_image_by_uuid(metadata['uuid'])
-        if not image:
-            image = Image.get_image_by_hash(metadata['hash'])
-            #TODO: image.hash is different than in our db, why?
-        if image:
-            print 'Image found! '+image.location
-            image_bin = open(image.location+image.name, 'rb')
-            hash=hashlib.sha256(image_bin.read()).hexdigest()
-            if hash == image.hash == metadata['hash']:
-                print 'Image already exists on server!'
-                return Response(json.dumps({'sync_status':'was_synced'}))
-            else:
-                print 'Imagehash mismatch!'
-                return Response(json.dumps({'sync_status':'sync_error'}))
+    sync_status='sync_error'
+    image_json = json.loads(request.POST.get('image_json'))
+    log_json = json.loads(request.POST.get('log_json'))
 
-    if filetype == 'track':
-        track = Track.get_track_by_uuid(metadata['uuid'])
-        #if not track:
-        #    track = Track.get_track_by_hash(metadata['hash'])
-        #    #TODO: track.hash is different than in our db, why?
-        #print track
-        #if track:
-        #    print 'Trac found! '+track.location
-        #    track_bin = open(track.location+track.name, 'rb')
-        #    hash=hashlib.sha256(track_bin.read()).hexdigest()
-        #    if hash == track.hash == metadata['hash']:
-        #        print 'Track already exists on server!'
-        #        return Response(json.dumps({'sync_status':'was_synced'}))
-        #    else:
-        #        print 'Trackhash mismatch!'
-        #        return Response(json.dumps({'sync_status':'sync_error'}))
- 
-    return Response(json.dumps({'sync_status':'not_synced'}))
+    image = Image.get_image_by_uuid(image_json['uuid'])
+
+    if image:
+        print 'Image found! '+image.location
+
+        image_bin = open(image.location+image.name, 'rb')
+        hash=hashlib.sha256(image_bin.read()).hexdigest()
+
+        if hash == image.hash == image_json['hash']:
+            print 'Image already exists on server!'
+            sync_status='was_synced'
+
+        else:
+            print 'Imagehash mismatch!'
+            sync_status='sync_error'
+    else:
+        sync_status = 'not_synced'
+    return Response(json.dumps({'log_id':log_json['id'],'type':'image',  'item_uuid':image_json['uuid'], 'sync_status':sync_status}))
 
 
 
 @view_config(route_name='sync', request_param='type=log')
 def logsync(request):
-    log_json = json.loads(request.POST.get('log').value)
+    sync_status='sync_error'
+    log_json = json.loads(request.POST.get('log_json').value)
     print log_json
-    log = Log.get_log_by_uuid(log_json['uuid']) #converts str-uuid to python-UUID, then looks up DB
+    etappe_json = log_json['etappe']
+    #TODO: might be better with dates instead of uuid
+    etappe = Etappe.get_etappe_by_uuid(etappe_json['uuid']) 
+    if not etappe:
+        etappe = Etappe(
+                start_date = etappe_json['start_date'],
+                end_date = etappe_json['end_date'],
+                name = etappe_json['name'],
+                uuid = etappe_json['uuid']
+                )
+        DBSession.add(etappe)
+        DBSession.flush()
+
+    log = Log.get_log_by_uuid(log_json['uuid'])
     if not log:
         print 'No log found, adding new log.'
         print 'Author: '+log_json['author']
         author = Author.get_author(log_json['author'])
+        print author
         log = Log(
-                infomarker_id = None,
+                infomarker = None,
                 topic=log_json['topic'],
                 content=log_json['content'],
                 author=author.id,
+                etappe=etappe.id,
                 created=log_json['created'],
                 uuid=log_json['uuid']
                 )
@@ -113,113 +117,205 @@ def logsync(request):
         sync_status = 'was_synced' #Item was already on the server earlier        
     else:
         sync_status = 'sync_error' #something is wrong here!
-    return Response(json.dumps({'item_uuid':str(log.uuid), 'item_id':log.id, 'log_id':log_json['id'], 'sync_status':sync_status}))
+    return Response(json.dumps({'log_id':log_json['id'], 'type':'log', 'item_uuid':log_json['uuid'], 'sync_status':sync_status}))
     
  
 
 
 @view_config(route_name='sync', request_param='type=image')
 def imagesync(request):
+    sync_status='sync_error'
     print request.POST.keys()
-    metadata = request.POST.get('metadata')
-    log = json.loads(request.POST.get('log').value)
+    image_json = request.POST.get('image_json')
+    log_json = json.loads(request.POST.get('log').value)
     image_bin = request.POST.get('image_bin')
 
-    img_info = json.loads(metadata.value)
-    author = Author.get_author(img_info['author'])
+    image_json = json.loads(image_json.value)
+    author = Author.get_author(image_json['author']['name'])
 
 
-    image = Image.get_image_by_uuid(img_info['uuid']) #does image with this uuid(from json-info) already exist in our db
+    image = Image.get_image_by_uuid(image_json['uuid']) #does image with this uuid(from json-info) already exist in our db
     if not image:
 
         basedir = '/srv/trackdata/bydate'
         img_prvw_w='500'
-        img_990_w='990'
-        created=datetime.strptime(log['created'], "%Y-%m-%d %H:%M:%S") #we use the timestamp from log.created for the image-location
+        img_large_w='990'
+        created=datetime.strptime(log_json['created'], "%Y-%m-%d %H:%M:%S") #we use the timestamp from log_json['created'] for the image-location
         datepath=created.strftime("%Y-%m-%d")
         filedir = filetools.createdir(basedir, author.name, datepath)
         imgdir = filedir+'images/sorted/'
 
-        filehash = filetools.safe_file(imgdir, img_info['name'], image_bin.value)
+        filehash = filetools.safe_file(imgdir, image_json['name'], image_bin.value)
 
-        imagetools.resize(imgdir, imgdir+img_prvw_w+'/', img_info['name'], img_prvw_w)
-        imagetools.resize(imgdir, imgdir+img_990_w+'/',img_info['name'] , img_990_w) #TODO: what happens when a 990px-wide img was uploaded?
+        imagetools.resize(imgdir, imgdir+img_prvw_w+'/', image_json['name'], img_prvw_w)
+        imagetools.resize(imgdir, imgdir+img_large_w+'/',image_json['name'] , img_large_w) #TODO: what happens when a 990px-wide img was uploaded?
 
-        hash_990=hashlib.sha256(open(imgdir+'990/'+img_info['name'], 'rb').read()).hexdigest() #TODO
+        hash_large=hashlib.sha256(open(imgdir+img_large_w+'/'+image_json['name'], 'rb').read()).hexdigest() #TODO
 
         image = Image(
-                    name = img_info['name'], 
+                    name = image_json['name'], 
                     location = imgdir, 
-                    title = img_info['title'],
-                    comment = img_info['comment'],
-                    alt = img_info['alt'],
+                    title = image_json['title'],
+                    comment = image_json['comment'],
+                    alt = image_json['alt'],
+                    aperture = image_json['aperture'],
+                    shutter = image_json['shutter'],
+                    focal_length = image_json['focal_length'],
+                    iso = image_json['iso'],
+                    timestamp_original = image_json['timestamp_original'],
                     hash = filehash,
-                    hash_990 = hash_990, #TODO: we need the real file's hash if 990px was uploaded and not converted
+                    hash_large = hash_large, #TODO: we need the real file's hash if 990px was uploaded and not converted
                     author = author.id,
+                    trackpoint = None,
                     last_change = timetools.now(),
                     published = timetools.now(),
-                    uuid = img_info['uuid']
+                    uuid = image_json['uuid']
                     )
         DBSession.add(image)
         DBSession.flush()
-        return Response(json.dumps({'item_uuid':image.uuid, 'item_id':image.id, 'log_id':log['id'], 'sync_status':'is_synced'}))
+        sync_status = 'is_synced'
 
     else:
-        #TODO: So our image is actually in the db - why has this not occured in sync?type=status??? 
+        #TODO: So our image is actually in the db - why has this been found earlier in sync?type=status??? 
         print 'ERROR: Image found in DB, but this should have happened in /sync?type=status'
-        return Response(json.dumps({'item_uuid':image.uuid, 'item_id':image.id, 'log_id':log['id'], 'sync_status':'sync_error'}))
+        sync_status='sync_error'
     
-    return Response(json.dumps({'item_uuid':None, 'item_id':None, 'log_id':log['id'], 'sync_status':'sync_error'})) #Something went very wrong
+    return Response(json.dumps({'log_id' : log_json['id'], 'type':'image', 'item_uuid':image_json['uuid'], 'sync_status':sync_status})) #Something went very wrong
 
 
 
 @view_config(route_name='sync', request_param='type=track')
 def tracksync(request):
+    sync_status='sync_error'
     print request.POST.keys()
-    metadata = request.POST.get('metadata')
-    log = json.loads(request.POST.get('log').value)
-    track_bin = request.POST.get('track_bin')
-    track_info = json.loads(metadata.value)
-    print track_info['author']
+    track_json = json.loads(request.POST.get('track'))
+    print track_json['distance']
+    log_json = json.loads(request.POST.get('log_json'))
+    print '\n'
+    print track_json['author']
 
-    author = Author.get_author(track_info['author'])
+    author = Author.get_author(track_json['author'])
 
 
-    track = Track.get_track_by_uuid(track_info['uuid']) #does track with this uuid(from json-info) already exist in our db
+    track = Track.get_track_by_uuid(track_json['uuid']) #does track with this uuid(from json-info) already exist in our db
     if not track:
-
-        basedir = '/srv/trackdata/bydate'
-        created=datetime.strptime(log['created'], "%Y-%m-%d %H:%M:%S") #we use the log-created-timestamp for the track-location
-        datepath=created.strftime("%Y-%m-%d")
-        filedir = filetools.createdir(basedir, author.name, datepath)
-        trackdir = filedir+'trackfile/'
-
-        filehash = filetools.safe_file(trackdir, track_info['name'], track_bin.value)
-        gpxtools.parse_gpx(trackdir+track_info['name'])
-
+        print '\n\n\n'
+        print 'Track not found by uuid %s!' %track_json['uuid']
+        print '\n\n\n'
         track = Track(
-                    date = track_info['date'],
-                    name = track_info['name'],
-                    location = trackdir,
-                    hash = filehash,
+                    reduced_trackpoints = track_json['reduced_trackpoints'],
+                    distance = track_json['distance'],
+                    timespan = track_json['timespan'],
+                    trackpoint_count = track_json['trackpoint_count'],
+                    start_time = track_json['start_time'],
+                    end_time = track_json['end_time'],
+                    color = track_json['color'],
                     author = author.id,
-                    uuid = track_info['uuid'],
-                    distance = track_info['distance'],
-                    timespan = track_info['timespan'],
-                    color = track_info['color']
+                    uuid = track_json['uuid']
                     )
         DBSession.add(track)
         DBSession.flush()
-        return Response(json.dumps({'item_uuid':track.uuid, 'item_id':track.id, 'log_id':log['id']}))
+        for trackpoint_json in track_json['trackpoints']:
+            trackpoint_in_db = Trackpoint.get_trackpoint_by_lat_lon_time(trackpoint_json['latitude'], \
+                                        trackpoint_json['longitude'], trackpoint_json['timestamp'])
+            if not trackpoint_in_db:
+                print trackpoint_json
+                trackpoint = Trackpoint(
+                                    track_id = track.id,
+                                    latitude = trackpoint_json['latitude'],
+                                    longitude = trackpoint_json['longitude'],
+                                    altitude = trackpoint_json['altitude'],
+                                    velocity = trackpoint_json['velocity'],
+                                    temperature = trackpoint_json['temperature'],
+                                    direction = trackpoint_json['direction'],
+                                    pressure = trackpoint_json['pressure'],
+                                    timestamp = trackpoint_json['timestamp'],
+                                    uuid = trackpoint_json['uuid']
+                                    )
+                DBSession.add(trackpoint)
+                DBSession.flush()
 
+        sync_status = 'is_synced'
+
+    elif track:
+        print 'was_synced'
+        sync_status = 'was_synced'
     else:
-        #TODO: So our track is already in the db - why has this not occured in sync?type=status??? 
-        print 'ERROR: Track found in DB, but this should have happened in /sync?type=status'
-        return Response(json.dumps({'item_uuid':track.uuid, 'item_id':track.id, 'log_id':log['id']}))
+        print 'sync_error'
+        sync_status = 'sync_error'
     
-    return Response(json.dumps({'item_uuid':None, 'item_id':None, 'log_id':log['id']})) #Something went very wrong
+    return Response(json.dumps({'log_id':log_json['id'], 'type':'track', 'item_uuid':track_json['uuid'], 'sync_status':sync_status}))
+
+@view_config(route_name='sync', request_param='interlink=log')
+def interlink_log(request):
+    log_json =  json.loads(request.POST.get('log_json'))
+    log = Log.get_log_by_uuid(log_json['uuid'])
+    latest_timestamp = datetime.strptime('1970-01-01', '%Y-%m-%d')
+    #Link to Tracks
+    for track in log_json['tracks']:
+        track = Track.get_track_by_uuid(track['uuid'])
+        print track.id
+        log.track.append(track)
+        #find the latest trackpoint-timestamp related to this log
+        #this will be the trackpoint linked to log as infomarker
+        if track.trackpoints[0].timestamp > latest_timestamp:
+            log.infomarker = track.trackpoints[0].id
+            latest_timestamp = track.trackpoints[0].timestamp
+   
+    #Get location for infomarker
+    location = Location(name = None, trackpoint_id = None, country_id = None)
+    location.name = flickrtools.findplace(log.infomarker_ref.latitude, log.infomarker_ref.longitude, 11, log.author_ref)
+    location.trackpoint_id = log.infomarker_ref.id,
+    location.country_id = flickrtools.get_country_by_lat_lon(log.infomarker_ref.latitude, log.infomarker_ref.longitude, log.author_ref).iso_numcode
+    DBSession.add(location)
+ 
+    #Link to Images
+    for image in log_json['images']:
+        image = Image.get_image_by_uuid(image['uuid'])
+        log.image.append(image)
+ 
+    content_with_uuid_tags = log.content
+    print content_with_uuid_tags
+    img_uuid_list = re.findall("(\[img_uuid=[0-9A-Za-z-]{1,}\])", content_with_uuid_tags)
+    #regex matches A-Z, a-z, 0-9 and "-", e.g. "0eb92a91-3a92-4707-be6e-1907f6c0829"
+    print img_uuid_list
+    for img_uuid_tag in img_uuid_list:
+        img_uuid = re.search("^\[img_uuid=([0-9A-Za-z-]{1,})\]$",img_uuid_tag).group(1)
+        image = Image.get_image_by_uuid(img_uuid)
+        if image:
+            content_with_uuid_tags=content_with_uuid_tags.replace(img_uuid_tag,('[imgid=%s]') % image.id)
+    log.content = content_with_uuid_tags
+    DBSession.add(log)
+    return Response(json.dumps({'link_status':'linked', 'item_uuid': log.uuid}))
 
 
-@view_config(route_name='sync', request_param='type=parse_track')
-def parse_track(request):
-   return(bla) 
+
+@view_config(route_name='sync', request_param='interlink=image')
+def interlink_image(request):
+    image_json = json.loads(request.POST.get('image_json'))
+    print image_json['id']
+    print image_json['name']
+    print image_json['trackpoint']
+    image = Image.get_image_by_uuid(image_json['uuid'])
+    trackpoint = Trackpoint.get_trackpoint_by_uuid(image_json['trackpoint']['uuid'])
+    image.trackpoint = trackpoint.id
+    DBSession.add(image)
+    return Response(json.dumps({'link_status':'linked', 'item_uuid': image.uuid}))
+    
+ 
+
+ 
+@view_config(route_name='sync', request_param='interlink=track')
+def interlink_track(request):
+    track_json = json.loads(request.POST.get('track_json'))
+    print track_json['id']
+    print track_json['start_time']
+    track = Track.get_track_by_uuid(track_json['uuid'])
+    etappen = Etappe.get_etappen_by_date(track_json['start_time'])
+    print etappen
+    for etappe in etappen:
+        print etappe.start_date
+        etappe.track.append(track)    
+    return Response(json.dumps({'link_status':'linked', 'item_uuid': track.uuid}))
+    
+ 

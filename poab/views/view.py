@@ -30,7 +30,7 @@ from poab.models import (
     Log,
     Track,
     Trackpoint,
-    Imageinfo,
+    Image,
     Timezone,
     Country,
     Continent
@@ -43,8 +43,8 @@ def fetch_images_for_trackpoints(q):
     trkpt_list=list()
     for trackpoint in trackpoints:
         trkpt_list.append(trackpoint.id)
-    q = DBSession.query(Imageinfo).filter(and_(Imageinfo.infomarker_id.in_(trkpt_list)))
-    images = q.order_by(asc(Imageinfo.flickrdatetaken)).all()
+    q = DBSession.query(Image).filter(and_(Image.trackpoint.in_(trkpt_list)))
+    images = q.order_by(asc(Image.timestamp_original)).all()
     return images
 
 
@@ -72,7 +72,7 @@ def view_view(request):
     except:
         page_number=None
     if id==0 and page_number==None:
-        q = DBSession.query(Imageinfo)
+        q = DBSession.query(Image)
         image_count=q.count()
         page_fract=float(Fraction(str(image_count)+'/10'))
         if int(str(page_fract).split('.')[1])==0:
@@ -87,8 +87,13 @@ def view_view(request):
     curr_page=int(page)
     #return { 'bla': log_count}
     if id==0:
-        q = DBSession.query(Trackpoint).filter(Trackpoint.country_id!=None)
+        ##TODO what was the idea behind "country_id!=None"?
+        ##q = DBSession.query(Trackpoint).filter(Trackpoint.country_id!=None)
+        q = DBSession.query(Trackpoint)
         images=fetch_images_for_trackpoints(q)
+        print '\n\n\n\n\n'
+        print images
+        print '\n\n\n\n\n'
     elif action=='c':
         q = DBSession.query(Trackpoint).filter(and_(Trackpoint.country_id==id))
         images=fetch_images_for_trackpoints(q)
@@ -96,7 +101,7 @@ def view_view(request):
         q = DBSession.query(Trackpoint).filter(and_(Trackpoint.id==id))
         images=fetch_images_for_trackpoints(q)
     elif action=='id':
-        images = DBSession.query(Imageinfo).filter(Imageinfo.id==id).all()
+        images = DBSession.query(Image).filter(Image.id==id).all()
     page_list=list()
     pages_list=list()
     i=0
@@ -113,32 +118,31 @@ def view_view(request):
         pages_list.append(page_list)
     viewlist=list()
     for image in pages_list[curr_page]:
-        if image.trackpoint_id:
-            trackpoint_id=image.trackpoint_id
+        if image.trackpoint:
+            trackpoint_id=image.trackpoint
         else:
             trackpoint_id=image.infomarker_id
             prefix='near '
         q = DBSession.query(Trackpoint).filter(Trackpoint.id==trackpoint_id)
         trackpointinfo=q.one()
-        q = DBSession.query(Timezone).filter(Timezone.id==trackpointinfo.timezone_id)
+        ##TODO: fix timezone
+        ##q = DBSession.query(Timezone).filter(Timezone.id==trackpointinfo.timezone_id)
+        q = DBSession.query(Timezone).filter(Timezone.id==8)
         timezone = q.one()
-        localtime = image.flickrdatetaken+timezone.utcoffset
+        localtime = image.timestamp_original+timezone.utcoffset
         deltaseconds=round(timezone.utcoffset.days*86400+timezone.utcoffset.seconds)
+        #TODO THIS SUCKS!
         class Viewdetail(object):
-            def __init__(self, photoid, flickrfarm, flickrserver, flickrphotoid, flickrsecret, title, description, log_id, imgname, aperture, shutter, focal_length, iso, trackpointinfo, localtime, timezone, utcoffset):
+            def __init__(self, photoid, title, description, log_id, imgname, aperture, shutter, focal_length, iso, trackpointinfo, localtime, timezone, utcoffset):
                 self.photoid=photoid
-                self.flickrfarm=flickrfarm                
-                self.flickrserver=flickrserver
-                self.flickrphotoid=flickrphotoid 
-                self.flickrsecret=flickrsecret
                 self.title=title
                 self.description=description
                 self.log_id=log_id
-                self.imgname=imgname
-                self.aperture=aperture
-                self.shutter=shutter
-                self.focal_length=focal_length
-                self.iso=iso
+                self.name = image.name
+                self.aperture= image.aperture
+                self.shutter= image.shutter
+                self.focal_length= image.focal_length
+                self.iso= image.iso
                 #logdate=c.loginfo.created.strftime('%Y-%m-%d') #needed for the imagepath
                 self.trackpointinfo=trackpointinfo
                 self.localtime=localtime
