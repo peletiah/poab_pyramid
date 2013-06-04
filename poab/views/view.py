@@ -72,7 +72,7 @@ def view_view(request):
     except:
         page_number=None
     if id==0 and page_number==None:
-        q = DBSession.query(Image)
+        q = DBSession.query(Image).order_by(Image.timestamp_original)
         image_count=q.count()
         page_fract=float(Fraction(str(image_count)+'/10'))
         if int(str(page_fract).split('.')[1])==0:
@@ -89,17 +89,20 @@ def view_view(request):
     if id==0:
         ##TODO what was the idea behind "country_id!=None"?
         ##q = DBSession.query(Trackpoint).filter(Trackpoint.country_id!=None)
-        q = DBSession.query(Trackpoint)
-        images=fetch_images_for_trackpoints(q)
+        #q = DBSession.query(Trackpoint)
+        #images=fetch_images_for_trackpoints(q)
+        images=Image.get_images()
         print '\n\n\n\n\n'
         print images
         print '\n\n\n\n\n'
     elif action=='c':
-        q = DBSession.query(Trackpoint).filter(and_(Trackpoint.country_id==id))
-        images=fetch_images_for_trackpoints(q)
+        #q = DBSession.query(Trackpoint).filter(and_(Trackpoint.country_id==id))
+        #images=fetch_images_for_trackpoints(q)
+        images=Image.get_images()
     elif action=='infomarker':
-        q = DBSession.query(Trackpoint).filter(and_(Trackpoint.id==id))
-        images=fetch_images_for_trackpoints(q)
+        #q = DBSession.query(Trackpoint).filter(and_(Trackpoint.id==id))
+        #images=fetch_images_for_trackpoints(q)
+        images=Image.get_images()
     elif action=='id':
         images = DBSession.query(Image).filter(Image.id==id).all()
     page_list=list()
@@ -117,14 +120,22 @@ def view_view(request):
         page_list.reverse()
         pages_list.append(page_list)
     viewlist=list()
+    print page_list
+    print pages_list
+    print curr_page
+    print pages_list[curr_page]
     for image in pages_list[curr_page]:
         if image.trackpoint:
             trackpoint_id=image.trackpoint
         else:
-            trackpoint_id=image.infomarker_id
+            trackpoint_id=3572 #TODO
             prefix='near '
         q = DBSession.query(Trackpoint).filter(Trackpoint.id==trackpoint_id)
         trackpointinfo=q.one()
+        print '\n\n\n\n'
+        print trackpointinfo.location_ref[0].name
+        print image.location.replace('/srv','')
+        print '\n\n\n\n'
         ##TODO: fix timezone
         ##q = DBSession.query(Timezone).filter(Timezone.id==trackpointinfo.timezone_id)
         q = DBSession.query(Timezone).filter(Timezone.id==8)
@@ -133,12 +144,13 @@ def view_view(request):
         deltaseconds=round(timezone.utcoffset.days*86400+timezone.utcoffset.seconds)
         #TODO THIS SUCKS!
         class Viewdetail(object):
-            def __init__(self, photoid, title, description, log_id, imgname, aperture, shutter, focal_length, iso, trackpointinfo, localtime, timezone, utcoffset):
+            def __init__(self, photoid, name, location, title, comment, alt, aperture, shutter, focal_length, iso, trackpointinfo, localtime, timezone, utcoffset, log):
                 self.photoid=photoid
+                self.name=name
+                self.location=location
                 self.title=title
-                self.description=description
-                self.log_id=log_id
-                self.name = image.name
+                self.comment=comment
+                self.alt=alt
                 self.aperture= image.aperture
                 self.shutter= image.shutter
                 self.focal_length= image.focal_length
@@ -149,7 +161,8 @@ def view_view(request):
                 self.timezone=timezone
                 #calculate the offset in seconds
                 self.utcoffset=utcoffset
-        viewdetail = Viewdetail(image.id, image.flickrfarm, image.flickrserver, image.flickrphotoid, image.flickrsecret, image.flickrtitle, image.flickrdescription, image.log_id, image.imgname, image.aperture, image.shutter, image.focal_length, image.iso, trackpointinfo, localtime.strftime('%Y-%m-%d %H:%M:%S'), timezone, timediff(deltaseconds))
+                self.log = log
+        viewdetail = Viewdetail(image.id, image.name, image.location.replace('/srv',''), image.title, image.comment, image.alt, image.aperture, image.shutter, image.focal_length, image.iso, trackpointinfo, localtime.strftime('%Y-%m-%d %H:%M:%S'), timezone, timediff(deltaseconds), image.log)
         viewlist.append(viewdetail)
 
     return {

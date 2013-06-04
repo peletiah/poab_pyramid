@@ -126,7 +126,7 @@ def log_view(request):
     for log in pages_list[curr_page]:
         twitter = False
         guid = None
-        print log.infomarker_ref.latitude
+        print log.trackpoint_log_ref
         # ###query for last trackpoint
         ##q = DBSession.query(Trackpoint).filter(and_(Trackpoint.track_id==infomarker.track_id,Trackpoint.id==infomarker.id)).order_by(asc(Trackpoint.timestamp))
         ##lasttrkpt=q.first()
@@ -134,7 +134,7 @@ def log_view(request):
         print log.images
         if len(log.images) > 0:
             #creates the infomarker-image_icon-and-ajax-link(fancy escaping for js needed):
-            gallerylink="""<span class="image_icon"><a title="Show large images related to this entry" href="/view/infomarker/%s/0"></a></span>""" % (log.infomarker_ref.id)
+            gallerylink="""<span class="image_icon"><a title="Show large images related to this entry" href="/view/infomarker/%s/0"></a></span>""" % (log.trackpoint_log_ref.id)
         else:
             gallerylink=''
         print log.tracks
@@ -184,11 +184,16 @@ def log_view(request):
                 q = DBSession.query(Image).filter(Image.id==image_id)
                 image = q.one()
                 print image
+                print '\n\n'
+                print '\n\n'
+                print image.location
+                print '\n\n'
+                print '\n\n'
                 if image.comment:
                     inlineimage='''<div class="log_inlineimage"><div class="imagecontainer"><a href="%s%s%s" title="%s" rel="image_colorbox"><img class="inlineimage" src="%s%s%s%s" alt="%s" /></a><div class="caption">
         <span>&#8594;</span>
             <a href="http://www.flickr.com/peletiah/%s" target="_blank">www.flickr.com</a>
-    </div></div><span class="imagedescription">%s</span></div>''' % ('/static', image.location, image.name, image.title, '/static', image.location, '500/', image.name, image.alt, 'test', image.comment)
+    </div></div><span class="imagedescription">%s</span></div>''' % ('/static', image.location.replace('/srv',''), image.name, image.title, '/static', image.location.replace('/srv',''), '500/', image.name, image.alt, 'test', image.comment)
                 else:
                     inlineimage='''<div class="log_inlineimage"><div class="imagecontainer"><a href="%s%s%s" title="%s" rel="image_colorbox" ><img class="inlineimage" src="%s%s%s%s" alt="%s" /></a><div class="caption">
         <span>&#8594;</span>
@@ -234,10 +239,10 @@ def log_view(request):
                     self.country=country.iso_countryname
                     self.continent=continent.name
                     self.location=lasttrkpt.location_ref[0].name
-                    self.infomarkerid=log.infomarker_ref.id
+                    self.infomarkerid=log.trackpoint_log_ref.id
                     self.id=log.id
                     self.gallerylink=gallerylink
-        logdetails = Logdetails(log.topic, twitter, guid, localtime, log_content_display, rounded_distance, timezone, timespan, country, continent, log.infomarker_ref, log.infomarker_ref, log, gallerylink) #TODO: "log.infomarker_ref, log.infomarker_ref" was originally "infomarker, lasttrkpt"
+        logdetails = Logdetails(log.topic, twitter, guid, localtime, log_content_display, rounded_distance, timezone, timespan, country, continent, log.trackpoint_log_ref, log.trackpoint_log_ref, log, gallerylink) #TODO: "log.trackpoint_log_ref, log.trackpoint_log_ref" was originally "infomarker, lasttrkpt"
         logdetaillist.append(logdetails)
 
     return {

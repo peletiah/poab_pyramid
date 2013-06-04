@@ -1,6 +1,5 @@
 import os, hashlib
 
-
 def createdir(abspath, relpath1, relpath2):
     if os.access(abspath+'/'+relpath1+'/'+relpath2+'/images',os.F_OK):
         pass
@@ -12,6 +11,12 @@ def createdir(abspath, relpath1, relpath2):
     else:
         os.mkdir(abspath+'/'+relpath1+'/'+relpath2+'/images/raw')
 
+    if os.access(abspath+'/'+relpath1+'/'+relpath2+'/images/jpg',os.F_OK):
+        pass
+    else:
+        os.mkdir(abspath+'/'+relpath1+'/'+relpath2+'/images/jpg')
+
+
     if os.access(abspath+'/'+relpath1+'/'+relpath2+'/images/sorted',os.F_OK):
         pass
     else:
@@ -22,22 +27,61 @@ def createdir(abspath, relpath1, relpath2):
     else:
         os.mkdir(abspath+'/'+relpath1+'/'+relpath2+'/images/sorted/990')
 
-    if os.access(abspath+'/'+relpath1+'/'+relpath2+'/images/sorted/preview',os.F_OK):
+    if os.access(abspath+'/'+relpath1+'/'+relpath2+'/images/sorted/500',os.F_OK):
         pass
     else:
-        os.mkdir(abspath+'/'+relpath1+'/'+relpath2+'/images/sorted/preview')
+        os.mkdir(abspath+'/'+relpath1+'/'+relpath2+'/images/sorted/500')
 
-    if os.access(abspath+'/'+relpath1+'/'+relpath2+'/images/sorted/thumbs',os.F_OK):
+    if os.access(abspath+'/'+relpath1+'/'+relpath2+'/images/sorted/thumb',os.F_OK):
         pass
     else:
-        os.mkdir(abspath+'/'+relpath1+'/'+relpath2+'/images/sorted/thumbs')
+        os.mkdir(abspath+'/'+relpath1+'/'+relpath2+'/images/sorted/thumb')
 
-
-    if os.access(abspath+'/'+relpath1+'/'+relpath2+'/trackfile',os.F_OK):
+    if os.access(abspath+'/'+relpath1+'/'+relpath2+'/videos',os.F_OK):
         pass
     else:
-        os.mkdir(abspath+'/'+relpath1+'/'+relpath2+'/trackfile')
+        os.mkdir(abspath+'/'+relpath1+'/'+relpath2+'/videos')
     return abspath+'/'+relpath1+'/'+relpath2+'/'
+
+
+
+#def createdir(abspath, relpath1, relpath2):
+#    if os.access(abspath+'/'+relpath1+'/'+relpath2+'/images',os.F_OK):
+#        pass
+#    else:
+#        os.makedirs(abspath+'/'+relpath1+'/'+relpath2+'/images')
+#
+#    if os.access(abspath+'/'+relpath1+'/'+relpath2+'/images/raw',os.F_OK):
+#        pass
+#    else:
+#        os.mkdir(abspath+'/'+relpath1+'/'+relpath2+'/images/raw')
+#
+#    if os.access(abspath+'/'+relpath1+'/'+relpath2+'/images/sorted',os.F_OK):
+#        pass
+#    else:
+#        os.mkdir(abspath+'/'+relpath1+'/'+relpath2+'/images/sorted')
+#
+#    if os.access(abspath+'/'+relpath1+'/'+relpath2+'/images/sorted/990',os.F_OK):
+#        pass
+#    else:
+#        os.mkdir(abspath+'/'+relpath1+'/'+relpath2+'/images/sorted/990')
+#
+#    if os.access(abspath+'/'+relpath1+'/'+relpath2+'/images/sorted/preview',os.F_OK):
+#        pass
+#    else:
+#        os.mkdir(abspath+'/'+relpath1+'/'+relpath2+'/images/sorted/preview')
+#
+#    if os.access(abspath+'/'+relpath1+'/'+relpath2+'/images/sorted/thumbs',os.F_OK):
+#        pass
+#    else:
+#        os.mkdir(abspath+'/'+relpath1+'/'+relpath2+'/images/sorted/thumbs')
+#
+#
+#    if os.access(abspath+'/'+relpath1+'/'+relpath2+'/trackfile',os.F_OK):
+#        pass
+#    else:
+#        os.mkdir(abspath+'/'+relpath1+'/'+relpath2+'/trackfile')
+#    return abspath+'/'+relpath1+'/'+relpath2+'/'
 
 
 def safe_file(filelocation, filename, file_bin):

@@ -10,30 +10,44 @@ from sqlalchemy.exc import DBAPIError
 from poab.models import (
     DBSession,
     Track,
-    Trackpoint,
+    Trackpoint
     )
 from sqlalchemy import and_
 
 from datetime import timedelta
-import time,datetime
+import time,datetime, json
 
 from decimal import Decimal, ROUND_HALF_UP
 
 
 def generate_json_from_tracks(tracks):
-    tracks_json = 'OpenLayers.Protocol.Script.registry.c1({"type":"FeatureCollection","features":['
+    features=list()
     for row in tracks:
-        if row.json_0002:
-            rounded_distance='<b>distance:</b> %skm<br />' % (str(row.distance.quantize(Decimal("0.01"), ROUND_HALF_UP)))
+        if row.reduced_trackpoints:
+            rounded_distance='<b>distance:</b> %skm<br />' % (str(Decimal(row.distance).quantize(Decimal("0.01"), ROUND_HALF_UP)))
             total_mins = row.timespan.seconds / 60
             mins = total_mins % 60
             hours = total_mins / 60
             timespan = '<b>duration:</b> %sh%smin<br />' % (str(hours),str(mins))
-            date=row.date.strftime('%B %d, %Y')
+            date=row.start_time.strftime('%B %d, %Y')
             color='#'+row.color
-            linestring = str(row.json_0002).replace('}}',('},"properties": {"type":"line","date":"%s","distance":"%s","timespan":"%s","color":"%s"}}') % (date,rounded_distance,timespan,color))
-            tracks_json = tracks_json + linestring + ','
-    tracks_json = tracks_json[:-1] + ']})'
+            reduced_track = list() 
+            features.append(
+                (dict(
+                type='Feature', 
+                geometry=dict(
+                    type="LineString", 
+                    coordinates=row.reduced_trackpoints
+                    ),
+                properties=dict(
+                    type = 'line',
+                    date = date,
+                    distance = rounded_distance,
+                    timespan = timespan,
+                    color = color
+                    ),
+                )))
+    tracks_json = 'OpenLayers.Protocol.Script.registry.c1('+json.dumps(dict(type='FeatureCollection', features=features))+')'
     return tracks_json
 
 def generate_json_from_trackpoint(trackpoint):
@@ -55,9 +69,9 @@ def json_track_view(request):
         id=0
     if action=='c' and id==0:
         after_date = datetime.datetime.strptime('2010-09-02',"%Y-%m-%d")
-        before_date = datetime.datetime.strptime('2010-12-07', "%Y-%m-%d")
+        before_date = datetime.datetime.strptime('2013-12-07', "%Y-%m-%d")
         curr_date = after_date
-        tracks = DBSession.query(Track).filter(and_(Track.date > after_date, Track.date < before_date)).all()
+        tracks = DBSession.query(Track).filter(and_(Track.start_time > after_date)).all()
         response = Response(generate_json_from_tracks(tracks))
     elif action=='c':
         trackpoints = DBSession.query(Trackpoint).filter(and_(Trackpoint.country_id==id,Trackpoint.infomarker==True)).all()

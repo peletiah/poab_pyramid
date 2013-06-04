@@ -32,6 +32,7 @@ from os import urandom
 from base64 import b64encode, b64decode
 from itertools import izip
 import uuid as uuidlib
+import datetime
 
 
 DBSession = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))
@@ -45,6 +46,10 @@ HASH_FUNCTION = 'sha256'  # Must be in hashlib.
 # amount of time on your server. Measure with:
 # python -m timeit -s 'import passwords as p' 'p.make_hash("something")'
 COST_FACTOR = 10000
+
+def now():
+    return datetime.datetime.now()
+
 
 #n-n-link between log and image tables
 log_image_table = Table('log_image', Base.metadata,
@@ -73,7 +78,8 @@ class Author(Base):
     password = Column(Unicode(80), nullable=False)
     uuid = Column("uuid", postgresql.UUID, unique=True)
     group = relationship('Group', secondary=author_group_table, backref='memberships')
-    author = relationship('Log', backref='author_ref')
+    author_log = relationship('Log', backref='author_log_ref')
+    author_img = relationship('Image', backref='author_img_ref')
 
     @property
     def __acl__(self):
@@ -231,7 +237,8 @@ class Log(Base):
     image = relationship('Image', secondary=log_image_table, backref='imageref')
     track = relationship('Track', secondary=log_track_table, backref='logs')
 
-    def __init__(self, infomarker, topic, content, author, etappe, created, uuid):
+    def __init__(self, id, infomarker, topic, content, author, etappe, created, uuid):
+        self.id = id
         self.infomarker = infomarker
         self.topic = topic
         self.content = content
@@ -249,38 +256,19 @@ class Log(Base):
             print "Error retrieving log %s: ",e
             return None
 
-class TrackOld(Base):
-    __tablename__ = 'track_old'
+class LogOld(Base):
+    __tablename__ = 'log_old'
     id = Column("id", Integer, primary_key=True, autoincrement=True)
-    date = Column("date", types.TIMESTAMP(timezone=False))
-    #author = Column(Integer, ForeignKey('author.id',onupdate="CASCADE", ondelete="CASCADE"))
-    distance = Column("distance", types.Numeric(11,4))
-    timespan = Column("timespan", types.Interval)
-    color = Column("color", types.CHAR(6), default='FF0000')
-    uuid = Column("uuid", types.UnicodeText)
-    #log = relationship('Log', secondary=log_track_table, backref='tracklogref')
-    #__table_args__ = (
-    #    UniqueConstraint('location', 'name', name='track_location_name'),
-    #    {}
-    #    )
-    #TODO: Foreign Key to Etappe/Log?
+    infomarker_id = Column("infomarker_id", types.Integer, ForeignKey('trackpoint.id'))
+    topic = Column("topic", types.UnicodeText)
+    content = Column("content", types.UnicodeText)
+    createdate = Column("createdate", types.TIMESTAMP(timezone=False),default=now())
 
-    def __init__(self, date, author, distance, timespan, color, uuid):
-        self.date = date
-        self.author = author
-        self.distance = distance
-        self.timespan = timespan
-        self.color = color
-        self.uuid = uuid
-
-    @classmethod
-    def get_track_by_uuid(self, uuid):
-        try:
-            track = DBSession.query(Track).filter(Track.uuid == uuid).one()
-            return track
-        except exc.NoResultFound,e:
-            print e
-            return None
+    def __init__(self, topic, content, createdate):
+        self.infomarker_id = infomarker_id
+        self.topic = topic
+        self.content = content
+        self.createdate = createdate
 
 
 
@@ -310,8 +298,9 @@ class Image(Base):
         {}
         )
 
-    def __init__(self, name, location, title, comment, alt, aperture, shutter, focal_length, iso, \
+    def __init__(self, id, name, location, title, comment, alt, aperture, shutter, focal_length, iso, \
                 timestamp_original, hash, hash_large, author, trackpoint, uuid, last_change=timetools.now(), published=None):
+        self.id = id
         self.name = name
         self.location = location
         self.title = title
@@ -343,7 +332,7 @@ class Image(Base):
 
     @classmethod
     def get_images(self):
-        images = DBSession.query(Image).all()
+        images = DBSession.query(Image).order_by(Image.timestamp_original).all()
         return images
 
     @classmethod
@@ -385,6 +374,35 @@ class Image(Base):
             return None
 
 
+class FlickrImage(Base):
+    __tablename__ = 'flickrimage'
+    id = Column(Integer, primary_key=True)
+    image = Column(Integer, ForeignKey('image.id',onupdate="CASCADE", ondelete="CASCADE"))
+    farm = Column("farm", types.VARCHAR(256))
+    server = Column("server", types.VARCHAR(256))
+    photoid = Column("photoid", types.VARCHAR(256))
+    secret = Column("secret", types.VARCHAR(256))
+    image_flickr = relationship('Image', backref='image_flickr_ref')
+    __table_args__ = (
+        UniqueConstraint('photoid', name='photoid'),
+        {}
+        )
+
+    def __init__(self, image, farm, server, photoid, secret):
+        self.image = image
+        self.farm = farm
+        self.server = server
+        self.photoid = photoid
+        self.secret = secret
+
+    def reprJSON(self):
+        return dict(id=self.id, image=self.image, farm=self.farm, server=self.server, 
+                    photoid=self.photoid, secret=self.secret)
+
+
+
+
+
 class FlickrCredentials(Base):
     __tablename__ = 'flickrcredentials'
     id = Column("id", Integer, primary_key=True, autoincrement=True)
@@ -419,7 +437,8 @@ class FlickrCredentials(Base):
 class Track(Base):
     __tablename__ = 'track'
     id = Column(Integer, primary_key=True)
-    reduced_trackpoints = Column(Text)
+    reduced_trackpoints = Column("reduced_trackpoints", postgresql.ARRAY(types.Float(), dimensions=2))
+    #reduced_trackpoints = Column("reduced_trackpoints", Text)
     distance = Column("distance", Text)
     timespan = Column("timespan", types.Interval)
     trackpoint_count = Column(Integer)
@@ -432,8 +451,9 @@ class Track(Base):
     trackpoints = relationship("Trackpoint", backref="tracks", order_by="desc(Trackpoint.timestamp)")
     log = relationship('Log', secondary=log_track_table, backref='tracks')
 
-    def __init__(self, reduced_trackpoints, distance, timespan, trackpoint_count,
-                start_time, end_time, color, author, uuid):
+    def __init__(self, id, reduced_trackpoints, distance, timespan, trackpoint_count,
+                start_time, end_time, color, author, etappe, uuid):
+        self.id = id
         self.reduced_trackpoints = reduced_trackpoints
         self.distance = distance
         self.timespan = timespan
@@ -442,6 +462,7 @@ class Track(Base):
         self.end_time = end_time
         self.color = color
         self.author = author
+        self.etappe = etappe
         self.uuid = uuid
 
     def reprJSON(self): #returns own columns only
@@ -482,6 +503,36 @@ class Track(Base):
             print "Error retrieving track %s: ",e
             return None
 
+class TrackOld(Base):
+    __tablename__ = 'track_old'
+    id = Column("id", Integer, primary_key=True, autoincrement=True)
+    date = Column("date", types.TIMESTAMP(timezone=False))
+    trkptnum = Column("trkptnum", Integer)
+    distance = Column("distance", types.Numeric(11,4))
+    timespan = Column("timespan", types.Interval)
+    gencpoly_pts = Column("gencpoly_pts", types.UnicodeText)
+    gencpoly_levels = Column("gencpoly_levels", types.UnicodeText)
+    color = Column("color", types.CHAR(6), default='FF0000')
+    maxlat = Column("maxlat", types.Numeric(9,7))
+    maxlon = Column("maxlon", types.Numeric(10,7))
+    minlat = Column("minlat", types.Numeric(9,7))
+    minlon = Column("minlon", types.Numeric(10,7))
+    json_0002 = Column("json_0002", Text)
+
+    def __init__(self, date, trkptnum, distance, timespan, gencpoly_pts, gencpoly_levels, color, maxlat, maxlon, minlat, minlon, json_0002):
+        self.date = date
+        self.trkptnum = trkptnum
+        self.distance = distance
+        self.timespan = timespan
+        self.gencpoly_pts = gencpoly_pts
+        self.gencpoly_levels = gencpoly_levels
+        self.color = color
+        self.maxlat = maxlat
+        self.maxlon = maxlon
+        self.minlat = minlat
+        self.minlon = minlon
+        self.json_0002 = json_0002
+
 
 class Trackpoint(Base):
     __tablename__ = 'trackpoint'
@@ -496,10 +547,12 @@ class Trackpoint(Base):
     pressure = Column("pressure", types.Integer)
     timestamp = Column("timestamp", types.TIMESTAMP(timezone=False))
     uuid = Column("uuid", postgresql.UUID, unique=True)
-    infomarker = relationship('Log', backref='infomarker_ref')
+    trackpoint_log = relationship('Log', backref='trackpoint_log_ref')
+    trackpoint_img = relationship('Image', backref='trackpoint_img_ref')
 
-    def __init__(self, track_id, latitude, longitude, altitude, velocity, temperature, direction, pressure, \
+    def __init__(self, id, track_id, latitude, longitude, altitude, velocity, temperature, direction, pressure, \
                 timestamp, uuid):
+        self.id = id
         self.track_id = track_id
         self.latitude = latitude
         self.longitude = longitude
@@ -529,6 +582,37 @@ class Trackpoint(Base):
             print "Error retrieving trackpoint %s: ",e
             return None
 
+class TrackpointOld(Base):
+    __tablename__ = 'trackpoint_old'
+    id = Column("id", Integer, primary_key=True, autoincrement=True)
+    track_id = Column("track_id", types.Integer, ForeignKey('track.id'))
+    timezone_id = Column("timezone_id", types.Integer, ForeignKey('timezone.id'))
+    country_id = Column("country_id", types.Integer, ForeignKey('country.iso_numcode'))
+    latitude = Column("latitude", types.Numeric(9,7))
+    longitude = Column("longitude", types.Numeric(10,7))
+    altitude = Column("altitude", types.Integer)
+    velocity = Column("velocity", types.Integer)
+    temperature = Column("temperature", types.Integer)
+    direction = Column("direction", types.Integer)
+    pressure = Column("pressure", types.Integer)
+    timestamp = Column("timestamp", types.TIMESTAMP(timezone=False))
+    infomarker = Column("infomarker", types.Boolean, default=False, nullable=False)
+    location = Column("location", types.VARCHAR(256))
+
+    def __init__(self, track_id, timezone_id, country_id, latitude, longitude, altitude, velocity, temperature, direction, pressure, timestamp, infomarker, location):
+        self.track_id = track_id
+        self.timezone_id = timezone_id
+        self.country_id = country_id
+        self.latitude = latitude
+        self.longitude = longitude
+        self.altitude = altitude
+        self.velocity = velocity
+        self.temperature = temperature
+        self.direction = direction
+        self.pressure = pressure
+        self.timestamp = timestamp
+        self.informarker = infomarker
+        self.location = location
 
 
 class Location(Base):
@@ -581,39 +665,6 @@ class Imageinfo(Base): #old version with integrated flickrdata
         self.flickrdescription = flickrdescription
 
 
-class TrackpointOld(Base):
-    __tablename__ = 'trackpoint_old'
-    id = Column("id", Integer, primary_key=True, autoincrement=True)
-    track_id = Column("track_id", types.Integer, ForeignKey('track.id'))
-    timezone_id = Column("timezone_id", types.Integer, ForeignKey('timezone.id'))
-    country_id = Column("country_id", types.Integer, ForeignKey('country.iso_numcode'))
-    latitude = Column("latitude", types.Numeric(9,7))
-    longitude = Column("longitude", types.Numeric(10,7))
-    altitude = Column("altitude", types.Integer)
-    velocity = Column("velocity", types.Integer)
-    temperature = Column("temperature", types.Integer)
-    direction = Column("direction", types.Integer)
-    pressure = Column("pressure", types.Integer)
-    timestamp = Column("timestamp", types.TIMESTAMP(timezone=False))
-    infomarker = Column("infomarker", types.Boolean, default=False, nullable=False)
-    location = Column("location", types.VARCHAR(256))
-
-    def __init__(self, track_id, timezone_id, country_id, latitude, longitude, altitude, velocity, temperature, direction, pressure, timestamp, infomarker, location):
-        self.track_id = track_id
-        self.timezone_id = timezone_id
-        self.country_id = country_id
-        self.latitude = latitude
-        self.longitude = longitude
-        self.altitude = altitude
-        self.velocity = velocity
-        self.temperature = temperature
-        self.direction = direction
-        self.pressure = pressure
-        self.timestamp = timestamp
-        self.infomarker = infomarker
-        self.location = location
-
-
 
 class Timezone(Base):
     __tablename__ = 'timezone'
@@ -654,3 +705,4 @@ class Continent(Base):
 
     def __init__(self, name):
         self.name = name
+

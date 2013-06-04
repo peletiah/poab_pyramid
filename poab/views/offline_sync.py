@@ -37,6 +37,8 @@ from poab.models import (
     )
 
 import hashlib, json
+from json import encoder
+encoder.FLOAT_REPR = lambda o: format(o, '.2f')
 
 from poab.helpers import (
     timetools,
@@ -203,7 +205,7 @@ def tracksync(request):
         print 'Track not found by uuid %s!' %track_json['uuid']
         print '\n\n\n'
         track = Track(
-                    reduced_trackpoints = track_json['reduced_trackpoints'],
+                    reduced_trackpoints = json.loads(track_json['reduced_trackpoints']),
                     distance = track_json['distance'],
                     timespan = track_json['timespan'],
                     trackpoint_count = track_json['trackpoint_count'],
@@ -261,12 +263,15 @@ def interlink_log(request):
         if track.trackpoints[0].timestamp > latest_timestamp:
             log.infomarker = track.trackpoints[0].id
             latest_timestamp = track.trackpoints[0].timestamp
-   
+    print log_json['tracks']
+    if not log_json['tracks']:
+        log.infomarker = 3572 #TODO
+ 
     #Get location for infomarker
     location = Location(name = None, trackpoint_id = None, country_id = None)
-    location.name = flickrtools.findplace(log.infomarker_ref.latitude, log.infomarker_ref.longitude, 11, log.author_ref)
-    location.trackpoint_id = log.infomarker_ref.id,
-    location.country_id = flickrtools.get_country_by_lat_lon(log.infomarker_ref.latitude, log.infomarker_ref.longitude, log.author_ref).iso_numcode
+    location.name = flickrtools.findplace(log.trackpoint_log_ref.latitude, log.trackpoint_log_ref.longitude, 11, log.author_log_ref)
+    location.trackpoint_id = log.trackpoint_log_ref.id,
+    location.country_id = flickrtools.get_country_by_lat_lon(log.trackpoint_log_ref.latitude, log.trackpoint_log_ref.longitude, log.author_log_ref).iso_numcode
     DBSession.add(location)
  
     #Link to Images
@@ -299,7 +304,15 @@ def interlink_image(request):
     image = Image.get_image_by_uuid(image_json['uuid'])
     trackpoint = Trackpoint.get_trackpoint_by_uuid(image_json['trackpoint']['uuid'])
     image.trackpoint = trackpoint.id
+    #Get location for image.trackpoint
+    location = Location(name = None, trackpoint_id = None, country_id = None)
+    location.name = flickrtools.findplace(image.trackpoint_img_ref.latitude, image.trackpoint_img_ref.longitude, 11, image.author_img_ref)
+    location.trackpoint_id = image.trackpoint_img_ref.id,
+    location.country_id = flickrtools.get_country_by_lat_lon(image.trackpoint_img_ref.latitude, image.trackpoint_img_ref.longitude, image.author_img_ref).iso_numcode
+    DBSession.add(location)
     DBSession.add(image)
+    
+
     return Response(json.dumps({'link_status':'linked', 'item_uuid': image.uuid}))
     
  

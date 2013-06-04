@@ -15,24 +15,22 @@ ${pages.pages()}
 </div>
 <% i=i+1 %>
 <div class="imagecontainer">
-    <!--<a href="/view/id/${viewdetail.photoid}" title="View photo by itself"><img class="image" src="http://farm${viewdetail.flickrfarm}.static.flickr.com/${viewdetail.flickrserver}/${viewdetail.flickrphotoid}_${viewdetail.flickrsecret}_b.jpg" /></a>-->
-    <!--<a rel="map_colorbox" href="/track/simple/${viewdetail.trackpointinfo.id}/${viewdetail.photoid}" title="View photolocation on map"><img class="image" src="http://farm${viewdetail.flickrfarm}.static.flickr.com/${viewdetail.flickrserver}/${viewdetail.flickrphotoid}_${viewdetail.flickrsecret}_b.jpg" /></a>-->
-    <a rel="map_colorbox" href="/track/simple/${viewdetail.trackpointinfo.id}/${viewdetail.photoid}" title="View photolocation on map"><img class="image" src="/static${viewdetail.location}900/${viewdetail.name}" /></a>
+    <a rel="map_colorbox" href="/track/simple/${viewdetail.trackpointinfo.id}/${viewdetail.photoid}" title="View photolocation on map"><img class="image" src="/static${viewdetail.location}990/${viewdetail.name}" /></a>
     <div class="caption">
          <span class="caption_left">
-            <span>&#8594;</span>
-            <a href="http://www.flickr.com/peletiah/${viewdetail.location}" target="_blank" title="View photo on flickr">www.flickr.com</a><br />
+            <!--<span>&#8594;</span>
+            <a href="http://www.flickr.com/peletiah/${viewdetail.location}" target="_blank" title="View photo on flickr">www.flickr.com</a><br />-->
             <span>&#8594;</span>
             <a rel="map_colorbox" href="/track/simple/${viewdetail.trackpointinfo.id}/${viewdetail.photoid}" title="View photolocation on map">view on map</a>
         </span>
         <span class="caption_center">
-                        % if viewdetail.description:
-                <a href="/log/id/${viewdetail.log_id}" title="Show log for this image">${viewdetail.description | n}</a>
-            % else:
-                <a href="/log/id/${viewdetail.log_id}" title="Show log for this image">&ldquo;${viewdetail.title}&rdquo;</a>
+            % if viewdetail.comment:
+                <a href="/log/id/${viewdetail.log[0].id}" title="Show log for this image">${viewdetail.comment | n}</a>
+            % elif viewdetail.title:
+                <a href="/log/id/${viewdetail.log[0].id}" title="Show log for this image">&ldquo;${viewdetail.title}&rdquo;</a>
             % endif            
             <br />
-            ${viewdetail.trackpointinfo.location},
+            ${viewdetail.trackpointinfo.location_ref[0].name},
             % if viewdetail.trackpointinfo.temperature==None:
             n/a,
             % else:
@@ -46,7 +44,7 @@ ${pages.pages()}
         </span>
         <span class="caption_right">
             ${viewdetail.localtime} (<a href="" title="${viewdetail.timezone.description}, ${viewdetail.utcoffset}">${viewdetail.timezone.abbreviation})</a><br />
-            ${viewdetail.focal_length}&nbsp;|&nbsp;${viewdetail.aperture}&nbsp;|&nbsp;${viewdetail.shutter}
+            ${viewdetail.focal_length}&nbsp;|&nbsp;f${viewdetail.aperture}&nbsp;|&nbsp;${viewdetail.shutter}s
         </span>
     
 

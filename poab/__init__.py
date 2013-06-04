@@ -29,6 +29,7 @@ def main(global_config, **settings):
     config.add_route('flickrauth', '/flickrauth')
     config.add_route('feed', '/feed')
     config.add_route('rss', '/rss')
+    config.add_route('copy_db', '/cd')
     config.scan()
     return config.make_wsgi_app()
 
