@@ -16,7 +16,9 @@ requires = [
     'pbkdf2',
     'waitress',
     'flickrapi',
-    'markdown'
+    'markdown',
+    'psycopg2',
+    'lxml'
     ]
 
 setup(name='poab',
