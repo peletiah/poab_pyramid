@@ -81,7 +81,7 @@ def log_view(request):
     except:
         page_number=None
     if id==0 and page_number==None:
-        q = DBSession.query(Log).filter(Log.id!=29)
+        q = DBSession.query(Log).order_by(Log.created).filter(Log.id!=29)
         log_count = q.count()
         page_fract=float(Fraction(str(log_count)+'/3'))
         if int(str(page_fract).split('.')[1])==0:
@@ -100,13 +100,13 @@ def log_view(request):
         ##trackpoints = DBSession.query(Trackpoint).filter(Trackpoint.infomarker==True).all()
         ##country_id=id
         ##logs=get_logs_by_trackpoints(trackpoints)
-        logs = DBSession.query(Log).all()
+        logs = DBSession.query(Log).order_by(Log.created).all()
     elif action=='c':
         trackpoints = DBSession.query(Trackpoint).filter(and_(Trackpoint.country_id==id,Trackpoint.infomarker==True)).all()
         country_id=id
         logs=get_logs_by_trackpoints(trackpoints)
     elif action=='id': 
-        logs = DBSession.query(Log).filter(Log.id==id).all()
+        logs = DBSession.query(Log).filter(Log.id==id).order_by(Log.created).all()
         country_id = DBSession.query(Trackpoint).filter(Trackpoint.id==logs[0].infomarker_id).one().country_id
     page_list=list()
     pages_list=list()
