@@ -131,9 +131,23 @@ def view_view(request):
             trackpoint_id=3572 #TODO
             prefix='near '
         q = DBSession.query(Trackpoint).filter(Trackpoint.id==trackpoint_id)
-        trackpointinfo=q.one()
-        print '\n\n\n\n'
-        print trackpointinfo.location_ref[0].name
+        try:
+            trackpointinfo=q.one()
+            print '\n\n\n\n'
+            print trackpointinfo.location_ref[0].name
+        except:
+            trackpointinfo = Trackpoint(
+                                    track_id = None,
+                                    latitude = None,
+                                    longitude = None,
+                                    altitude = None,
+                                    velocity = None,
+                                    temperature = None,
+                                    direction = None,
+                                    pressure = None,
+                                    timestamp = None,
+                                    uuid = None
+                                    )
         print image.location.replace('/srv','')
         print '\n\n\n\n'
         ##TODO: fix timezone
@@ -144,7 +158,8 @@ def view_view(request):
         deltaseconds=round(timezone.utcoffset.days*86400+timezone.utcoffset.seconds)
         #TODO THIS SUCKS!
         class Viewdetail(object):
-            def __init__(self, photoid, name, location, title, comment, alt, aperture, shutter, focal_length, iso, trackpointinfo, localtime, timezone, utcoffset, log):
+            def __init__(self, image, photoid, name, location, title, comment, alt, aperture, shutter, focal_length, iso, trackpointinfo, localtime, timezone, utcoffset, log):
+                self.image = image
                 self.photoid=photoid
                 self.name=name
                 self.location=location
@@ -162,7 +177,7 @@ def view_view(request):
                 #calculate the offset in seconds
                 self.utcoffset=utcoffset
                 self.log = log
-        viewdetail = Viewdetail(image.id, image.name, image.location.replace('/srv',''), image.title, image.comment, image.alt, image.aperture, image.shutter, image.focal_length, image.iso, trackpointinfo, localtime.strftime('%Y-%m-%d %H:%M:%S'), timezone, timediff(deltaseconds), image.log)
+        viewdetail = Viewdetail(image, image.id, image.name, image.location.replace('/srv',''), image.title, image.comment, image.alt, image.aperture, image.shutter, image.focal_length, image.iso, trackpointinfo, localtime.strftime('%Y-%m-%d %H:%M:%S'), timezone, timediff(deltaseconds), image.log)
         viewlist.append(viewdetail)
 
     return {

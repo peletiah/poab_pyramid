@@ -7,6 +7,7 @@ from poab.models  import (
     Country
     )
 
+from lxml import etree
 
 def getcredentials(author):
     credentials=FlickrCredentials.get_flickrcredentials_by_author(author.id)
@@ -14,9 +15,28 @@ def getcredentials(author):
     return flickr
 
 
+def getimginfo(photoid, author):
+    try:
+        credentials=FlickrCredentials.get_flickrcredentials_by_author(author.id)
+        flickr = flickrapi.FlickrAPI(credentials.api_key, credentials.api_secret, username=author.name, format='etree')
+
+        photoinfo=flickr.photos_getInfo(photo_id=photoid)
+        secret=photoinfo.find('photo').attrib['secret']
+        originalsecret=photoinfo.find('photo').attrib['originalsecret']
+        server=photoinfo.find('photo').attrib['server']
+        farm=photoinfo.find('photo').attrib['farm']
+        originalformat=photoinfo.find('photo').attrib['originalformat']
+        return farm,server,photoid,secret,originalsecret,originalformat
+    except flickrapi.FlickrError, (value):
+        sys.stderr.write("%s\n" % (value, ))
+        sys.exit(1)
+
+
+
 def uploadimage(image, author, size):
     credentials=FlickrCredentials.get_flickrcredentials_by_author(author.id)
     flickr = flickrapi.FlickrAPI(credentials.api_key, credentials.api_secret, username=author.name, format='etree')
+    
     filename = str(image.location+size+image.name)
     title = image.title
     if not title:
@@ -26,7 +46,9 @@ def uploadimage(image, author, size):
         description = ''
     tags = ''
     result=flickr.upload(filename=str(filename),title=title,description=description,tags=tags)
-    return result
+    photoid = result.find('photoid').text
+    farm,server,photoid,secret,originalsecret,originalformat = getimginfo(photoid, author)
+    return farm,server,photoid,secret,originalsecret,originalformat
 
 
 def findplace(lat,lon,accuracy, author):

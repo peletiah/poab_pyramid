@@ -18,8 +18,10 @@ ${pages.pages()}
     <a rel="map_colorbox" href="/track/simple/${viewdetail.trackpointinfo.id}/${viewdetail.photoid}" title="View photolocation on map"><img class="image" src="/static${viewdetail.location}990/${viewdetail.name}" /></a>
     <div class="caption">
          <span class="caption_left">
-            <!--<span>&#8594;</span>
-            <a href="http://www.flickr.com/peletiah/${viewdetail.location}" target="_blank" title="View photo on flickr">www.flickr.com</a><br />-->
+            % if viewdetail.image.image_flickr_ref:
+            <span>&#8594;</span>
+            <a href="http://www.flickr.com/peletiah/${viewdetail.image.image_flickr_ref[0].photoid}" target="_blank" title="View photo on flickr">www.flickr.com</a><br />
+            % endif
             <span>&#8594;</span>
             <a rel="map_colorbox" href="/track/simple/${viewdetail.trackpointinfo.id}/${viewdetail.photoid}" title="View photolocation on map">view on map</a>
         </span>
@@ -30,7 +32,9 @@ ${pages.pages()}
                 <a href="/log/id/${viewdetail.log[0].id}" title="Show log for this image">&ldquo;${viewdetail.title}&rdquo;</a>
             % endif            
             <br />
+            % if viewdetail.trackpointinfo.location_ref:
             ${viewdetail.trackpointinfo.location_ref[0].name},
+            % endif
             % if viewdetail.trackpointinfo.temperature==None:
             n/a,
             % else:

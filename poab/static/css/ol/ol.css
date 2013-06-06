@@ -7,9 +7,8 @@ html, body, #mapdiv {
                 font-family: trebuchet, "Lucida Sans Unicode", "Lucida Grande", verdana, arial,'Bitstream Vera Sans',helvetica,sans-serif;
         }
 
-        .menu {
-            position: absolute;
-            z-index: 20000;
+        .menu {            position: absolute;
+            z-index: 1000;
             width: 100%;
             Border: 0;
             Vertical-align: baseline;
@@ -49,5 +48,9 @@ html, body, #mapdiv {
                 border-radius: 5px;
                 opacity: 0.9;
         }
+
+.olFramedCloudPopupContent {
+  color:black;
+}
 
 

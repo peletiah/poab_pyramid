@@ -30,6 +30,7 @@ from poab.models import (
     Trackpoint,
     Location,
     Image,
+    FlickrImage,
     Imageinfo,
     Timezone,
     Country,
@@ -213,6 +214,7 @@ def tracksync(request):
                     end_time = track_json['end_time'],
                     color = track_json['color'],
                     author = author.id,
+                    etappe = None,
                     uuid = track_json['uuid']
                     )
         DBSession.add(track)
@@ -303,14 +305,21 @@ def interlink_image(request):
     print image_json['trackpoint']
     image = Image.get_image_by_uuid(image_json['uuid'])
     trackpoint = Trackpoint.get_trackpoint_by_uuid(image_json['trackpoint']['uuid'])
-    image.trackpoint = trackpoint.id
+    location = None
+    if trackpoint:
+        image.trackpoint = trackpoint.id
     #Get location for image.trackpoint
-    location = Location(name = None, trackpoint_id = None, country_id = None)
-    location.name = flickrtools.findplace(image.trackpoint_img_ref.latitude, image.trackpoint_img_ref.longitude, 11, image.author_img_ref)
-    location.trackpoint_id = image.trackpoint_img_ref.id,
-    location.country_id = flickrtools.get_country_by_lat_lon(image.trackpoint_img_ref.latitude, image.trackpoint_img_ref.longitude, image.author_img_ref).iso_numcode
-    DBSession.add(location)
+        location = Location(name = None, trackpoint_id = None, country_id = None)
+        location.name = flickrtools.findplace(image.trackpoint_img_ref.latitude, image.trackpoint_img_ref.longitude, 11, image.author_img_ref)
+        location.trackpoint_id = image.trackpoint_img_ref.id,
+        location.country_id = flickrtools.get_country_by_lat_lon(image.trackpoint_img_ref.latitude, image.trackpoint_img_ref.longitude, image.author_img_ref).iso_numcode
+    if not image.image_flickr_ref:
+        farm,server,photoid,secret,originalsecret,originalformat = flickrtools.uploadimage(image, image.author_img_ref, '')
+        flickrimage = FlickrImage(image = image.id, farm = farm, server = server, photoid = photoid, secret = secret)
+        DBSession.add(flickrimage)
     DBSession.add(image)
+    if location: #TODO(Ugly?)
+        DBSession.add(location)
     
 
     return Response(json.dumps({'link_status':'linked', 'item_uuid': image.uuid}))

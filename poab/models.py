@@ -237,8 +237,7 @@ class Log(Base):
     image = relationship('Image', secondary=log_image_table, backref='imageref')
     track = relationship('Track', secondary=log_track_table, backref='logs')
 
-    def __init__(self, id, infomarker, topic, content, author, etappe, created, uuid):
-        self.id = id
+    def __init__(self, infomarker, topic, content, author, etappe, created, uuid):
         self.infomarker = infomarker
         self.topic = topic
         self.content = content
@@ -298,9 +297,8 @@ class Image(Base):
         {}
         )
 
-    def __init__(self, id, name, location, title, comment, alt, aperture, shutter, focal_length, iso, \
+    def __init__(self, name, location, title, comment, alt, aperture, shutter, focal_length, iso, \
                 timestamp_original, hash, hash_large, author, trackpoint, uuid, last_change=timetools.now(), published=None):
-        self.id = id
         self.name = name
         self.location = location
         self.title = title
@@ -451,9 +449,8 @@ class Track(Base):
     trackpoints = relationship("Trackpoint", backref="tracks", order_by="desc(Trackpoint.timestamp)")
     log = relationship('Log', secondary=log_track_table, backref='tracks')
 
-    def __init__(self, id, reduced_trackpoints, distance, timespan, trackpoint_count,
+    def __init__(self, reduced_trackpoints, distance, timespan, trackpoint_count,
                 start_time, end_time, color, author, etappe, uuid):
-        self.id = id
         self.reduced_trackpoints = reduced_trackpoints
         self.distance = distance
         self.timespan = timespan
@@ -550,9 +547,8 @@ class Trackpoint(Base):
     trackpoint_log = relationship('Log', backref='trackpoint_log_ref')
     trackpoint_img = relationship('Image', backref='trackpoint_img_ref')
 
-    def __init__(self, id, track_id, latitude, longitude, altitude, velocity, temperature, direction, pressure, \
+    def __init__(self, track_id, latitude, longitude, altitude, velocity, temperature, direction, pressure, \
                 timestamp, uuid):
-        self.id = id
         self.track_id = track_id
         self.latitude = latitude
         self.longitude = longitude

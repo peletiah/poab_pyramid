@@ -71,7 +71,7 @@ def json_track_view(request):
         after_date = datetime.datetime.strptime('2010-09-02',"%Y-%m-%d")
         before_date = datetime.datetime.strptime('2013-12-07', "%Y-%m-%d")
         curr_date = after_date
-        tracks = DBSession.query(Track).filter(and_(Track.start_time > after_date)).all()
+        tracks = DBSession.query(Track).filter(and_(Track.start_time > after_date, Track.id != 141)).all()
         response = Response(generate_json_from_tracks(tracks))
     elif action=='c':
         trackpoints = DBSession.query(Trackpoint).filter(and_(Trackpoint.country_id==id,Trackpoint.infomarker==True)).all()
