@@ -30,6 +30,7 @@ from poab.models import (
     Log,
     Track,
     Trackpoint,
+    Location,
     Image,
     Imageinfo,
     Timezone,
@@ -81,9 +82,11 @@ def log_view(request):
     except:
         page_number=None
     if id==0 and page_number==None:
-        q = DBSession.query(Log).order_by(Log.created).filter(Log.id!=29)
+        q = DBSession.query(Log).order_by(Log.created)
         log_count = q.count()
         page_fract=float(Fraction(str(log_count)+'/3'))
+        print '\n\n\n PAGE FRACT'
+        print page_fract
         if int(str(page_fract).split('.')[1])==0:
             page=int(str(page_fract).split('.')[0])-1
         else:               
@@ -102,12 +105,18 @@ def log_view(request):
         ##logs=get_logs_by_trackpoints(trackpoints)
         logs = DBSession.query(Log).order_by(Log.created).all()
     elif action=='c':
-        trackpoints = DBSession.query(Trackpoint).filter(and_(Trackpoint.country_id==id,Trackpoint.infomarker==True)).all()
-        country_id=id
-        logs=get_logs_by_trackpoints(trackpoints)
+        locations = DBSession.query(Location).filter(Location.country_id==id).all()
+        trackpoints = list()
+        for location in locations:
+            trackpoint = DBSession.query(Trackpoint).filter(Trackpoint.location_ref.contains(location)).all()
+            trackpoints.append(trackpoint)
+        logs = list()
+        for trackpoint in trackpoints:
+            print trackpoint
+            log = DBSession.query(Log).filter(Log.trackpoint_log_ref==trackpoint).all()
+            logs.append(log)            
     elif action=='id': 
         logs = DBSession.query(Log).filter(Log.id==id).order_by(Log.created).all()
-        country_id = DBSession.query(Trackpoint).filter(Trackpoint.id==logs[0].infomarker_id).one().country_id
     page_list=list()
     pages_list=list()
     i=0
@@ -134,7 +143,7 @@ def log_view(request):
         print log.images
         if len(log.images) > 0:
             #creates the infomarker-image_icon-and-ajax-link(fancy escaping for js needed):
-            gallerylink="""<span class="image_icon"><a title="Show large images related to this entry" href="/view/infomarker/%s/0"></a></span>""" % (log.trackpoint_log_ref.id)
+            gallerylink="""<span class="image_icon"><a title="Show large images related to this entry" href="/view/log/%s/0"></a></span>""" % (log.id)
         else:
             gallerylink=''
         print log.tracks

@@ -234,7 +234,7 @@ class Log(Base):
     etappe = Column(Integer, ForeignKey('etappe.id', onupdate="CASCADE", ondelete="CASCADE"))
     created = Column("created", types.TIMESTAMP(timezone=False),default=timetools.now())
     uuid = Column("uuid", postgresql.UUID, unique=True)
-    image = relationship('Image', secondary=log_image_table, backref='imageref')
+    image = relationship('Image', secondary=log_image_table, backref='logs')
     track = relationship('Track', secondary=log_track_table, backref='logs')
 
     def __init__(self, infomarker, topic, content, author, etappe, created, uuid):

@@ -99,10 +99,11 @@ def view_view(request):
         #q = DBSession.query(Trackpoint).filter(and_(Trackpoint.country_id==id))
         #images=fetch_images_for_trackpoints(q)
         images=Image.get_images()
-    elif action=='infomarker':
+    elif action=='log':
         #q = DBSession.query(Trackpoint).filter(and_(Trackpoint.id==id))
         #images=fetch_images_for_trackpoints(q)
-        images=Image.get_images()
+        log = DBSession.query(Log).filter(Log.id==id).one()
+        images = DBSession.query(Image).filter(Image.logs.contains(log))
     elif action=='id':
         images = DBSession.query(Image).filter(Image.id==id).all()
     page_list=list()
