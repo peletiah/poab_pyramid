@@ -203,8 +203,8 @@ def copy_db(request):
 
             name = image_old.imgname.split('/')[-1]
             location_old = image_old.imgname
-            #location_old_prefix = '/srv'
-            location_old_prefix = '/media/backup2/images/images_backup2/srv'
+            location_old_prefix = '/srv'
+            #location_old_prefix = '/media/backup2/images/images_backup2/srv'
             basedir = '/srv/trackdata/bydate'
             img_large_w='990' #width of images in editor-preview
             img_medium_w='500' #width of images in editor-preview
