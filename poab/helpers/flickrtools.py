@@ -45,6 +45,10 @@ def uploadimage(image, author, size):
     if not description:
         description = ''
     tags = ''
+    print '\n\n\n\n'
+    print image.id
+    print title.encode('utf-8'), description.encode('utf-8')
+    print '\n\n\n\n'
     result=flickr.upload(filename=str(filename),title=title,description=description,tags=tags)
     photoid = result.find('photoid').text
     farm,server,photoid,secret,originalsecret,originalformat = getimginfo(photoid, author)

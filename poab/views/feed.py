@@ -29,7 +29,7 @@ from poab.models import (
     Log,
     Track,
     Trackpoint,
-    Imageinfo,
+    Image,
     Timezone,
     Country,
     Continent
@@ -102,27 +102,32 @@ def rss_view(request):
             guid=p.search(log.topic).group("guid")
             twitter=True
         log_content_display=log.content
-        imgidtags=re.findall('\[imgid[0-9]*\]',log_content_display)
+        imgidtags=re.findall('\[imgid=[0-9]*\]',log_content_display)
+        print '\n\n'
+        print '\n\n'
         print imgidtags
         print log.id
         for imgidtag in imgidtags:
-                imageinfo_id=imgidtag[6:-1]
-                print imageinfo_id
-                q = DBSession.query(Imageinfo).filter(Imageinfo.id==imageinfo_id)
-                imageinfo = q.one()
+                #imageinfo_id=imgidtag[6:-1]
+               # print imageinfo_id
+               # q = DBSession.query(Imageinfo).filter(Imageinfo.id==imageinfo_id)
+               # imageinfo = q.one()
+                image_id=re.search("^\[imgid=(\d{1,})\]$",imgidtag).group(1)
+                print image_id
+                #imageinfo_id=imgidtag[6:-1]
+                q = DBSession.query(Image).filter(Image.id==image_id)
+                image = q.one()
                 #flickrlink_large = 'http://farm%s.static.flickr.com/%s/%s_%s_b.jpg' % (imageinfo.flickrfarm,imageinfo.flickrserver,imageinfo.flickrphotoid,imageinfo.flickrsecret)
-                image_large = '/static%s' % (imageinfo.imgname)
-                if imageinfo.flickrdescription==None:
-                    inlineimage='''<div class="log_inlineimage"> <div class="imagecontainer"><a href="%s" title="%s" rel="image_colorbox"><img class="inlineimage" src="http://farm%s.static.flickr.com/%s/%s_%s.jpg" alt="%s" /></a><div class="caption">
+                if image.comment:
+                    inlineimage='''<div class="log_inlineimage"><div class="imagecontainer"><a href="%s%s%s" title="%s" rel="image_colorbox"><img class="inlineimage" src="%s%s%s%s" alt="%s" /></a><div class="caption">
         <span>&#8594;</span>
             <a href="http://www.flickr.com/peletiah/%s" target="_blank">www.flickr.com</a>
-    </div></div></div>''' % (image_large,imageinfo.flickrtitle,imageinfo.flickrfarm,imageinfo.flickrserver,imageinfo.flickrphotoid,imageinfo.flickrsecret,imageinfo.flickrtitle,imageinfo.flickrphotoid)
+    </div></div><span class="imagedescription">%s</span></div>''' % ('/static', image.location.replace('/srv',''), image.name, image.title, '/static', image.location.replace('/srv',''), '500/', image.name, image.alt, image.image_flickr_ref[0].photoid, image.comment)
                 else:
-                    inlineimage='''<div class="log_inlineimage"><div class="imagecontainer"><a href="%s" title="%s" rel="image_colorbox" ><img class="inlineimage" src="http://farm%s.static.flickr.com/%s/%s_%s.jpg" alt="%s" /></a><div class="caption">
+                    inlineimage='''<div class="log_inlineimage"><div class="imagecontainer"><a href="%s%s%s" title="%s" rel="image_colorbox" ><img class="inlineimage" src="%s%s%s%s" alt="%s" /></a><div class="caption">
         <span>&#8594;</span>
             <a href="http://www.flickr.com/peletiah/%s" target="_blank">www.flickr.com</a>
-    </div></div><span class="imagedescription">%s</span></div>''' % (image_large,imageinfo.flickrtitle,imageinfo.flickrfarm,imageinfo.flickrserver,imageinfo.flickrphotoid,imageinfo.flickrsecret,imageinfo.flickrtitle,imageinfo.flickrphotoid,imageinfo.flickrdescription)
-
+    </div></div></div>''' % ('/static', image.location.replace('/srv',''), image.name, image.title, '/static', image.location.replace('/srv',''), '500/', image.name, image.alt, image.image_flickr_ref[0].photoid) #TODO breaks when no flickr-info in db
                 log_content_display=log_content_display.replace(imgidtag,inlineimage)
         urlfinder = re.compile('^(http:\/\/\S+)')
         urlfinder2 = re.compile('\s(http:\/\/\S+)')

@@ -247,7 +247,7 @@ def log_view(request):
                         self.timespan=None
                     self.country=country.iso_countryname
                     self.continent=continent.name
-                    self.location=lasttrkpt.location_ref[0].name
+                    self.location=log.trackpoint_log_ref.location_ref[0].name
                     self.infomarkerid=log.trackpoint_log_ref.id
                     self.id=log.id
                     self.gallerylink=gallerylink

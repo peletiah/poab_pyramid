@@ -131,7 +131,7 @@ def imagesync(request):
     print request.POST.keys()
     image_json = request.POST.get('image_json')
     log_json = json.loads(request.POST.get('log').value)
-    image_bin = request.POST.get('image_bin')
+    #image_bin = request.POST.get('image_bin')
 
     image_json = json.loads(image_json.value)
     author = Author.get_author(image_json['author']['name'])
@@ -148,13 +148,14 @@ def imagesync(request):
         filedir = filetools.createdir(basedir, author.name, datepath)
         imgdir = filedir+'images/sorted/'
 
-        filehash = filetools.safe_file(imgdir, image_json['name'], image_bin.value)
+        #filehash = filetools.safe_file(imgdir, image_json['name'], image_bin.value)
 
         imagetools.resize(imgdir, imgdir+img_prvw_w+'/', image_json['name'], img_prvw_w)
         imagetools.resize(imgdir, imgdir+img_large_w+'/',image_json['name'] , img_large_w) #TODO: what happens when a 990px-wide img was uploaded?
 
-        hash_large=hashlib.sha256(open(imgdir+img_large_w+'/'+image_json['name'], 'rb').read()).hexdigest() #TODO
 
+        hash_large=hashlib.sha256(open(imgdir+img_large_w+'/'+image_json['name'], 'rb').read()).hexdigest() #TODO
+        filehash=hashlib.sha256(open(imgdir+'/'+image_json['name'], 'rb').read()).hexdigest() #TODO
         image = Image(
                     name = image_json['name'], 
                     location = imgdir, 
@@ -274,6 +275,8 @@ def interlink_log(request):
     location.name = flickrtools.findplace(log.trackpoint_log_ref.latitude, log.trackpoint_log_ref.longitude, 11, log.author_log_ref)
     location.trackpoint_id = log.trackpoint_log_ref.id,
     location.country_id = flickrtools.get_country_by_lat_lon(log.trackpoint_log_ref.latitude, log.trackpoint_log_ref.longitude, log.author_log_ref).iso_numcode
+    #print '\n\n\n\n\n\n'+location.name
+    print '\n\n\n\n\n'
     DBSession.add(location)
  
     #Link to Images
@@ -282,7 +285,7 @@ def interlink_log(request):
         log.image.append(image)
  
     content_with_uuid_tags = log.content
-    print content_with_uuid_tags
+    #print content_with_uuid_tags
     img_uuid_list = re.findall("(\[img_uuid=[0-9A-Za-z-]{1,}\])", content_with_uuid_tags)
     #regex matches A-Z, a-z, 0-9 and "-", e.g. "0eb92a91-3a92-4707-be6e-1907f6c0829"
     print img_uuid_list
@@ -314,6 +317,8 @@ def interlink_image(request):
         location.trackpoint_id = image.trackpoint_img_ref.id,
         location.country_id = flickrtools.get_country_by_lat_lon(image.trackpoint_img_ref.latitude, image.trackpoint_img_ref.longitude, image.author_img_ref).iso_numcode
     if not image.image_flickr_ref:
+        print '\n\n\n\n\n\n\n'+str(image.id)
+        print '\n\n\n\n\n\n\n'
         farm,server,photoid,secret,originalsecret,originalformat = flickrtools.uploadimage(image, image.author_img_ref, '')
         flickrimage = FlickrImage(image = image.id, farm = farm, server = server, photoid = photoid, secret = secret)
         DBSession.add(flickrimage)

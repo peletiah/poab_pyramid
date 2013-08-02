@@ -31,7 +31,8 @@ def generate_json_from_tracks(tracks):
             timespan = '<b>duration:</b> %sh%smin<br />' % (str(hours),str(mins))
             date=row.start_time.strftime('%B %d, %Y')
             color='#'+row.color
-            reduced_track = list() 
+            reduced_track = list()
+            print row.reduced_trackpoints 
             features.append(
                 (dict(
                 type='Feature', 
@@ -47,7 +48,9 @@ def generate_json_from_tracks(tracks):
                     color = color
                     ),
                 )))
+            print features
     tracks_json = 'OpenLayers.Protocol.Script.registry.c1('+json.dumps(dict(type='FeatureCollection', features=features))+')'
+    print tracks_json
     return tracks_json
 
 def generate_json_from_trackpoint(trackpoint):
