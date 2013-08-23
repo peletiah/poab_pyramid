@@ -22,7 +22,7 @@
         </div>
     </div>
     <div class="about">
-        <h1>About Daniela</h1>
+        <h1 id="daniela">About Daniela</h1>
         <div class="aboutcontent">
             <div class="about_images_right">
                 <img src="/static/images/about/daniela_colosseum_cropped_3.jpg" alt="Daniela with her camera in front of the Colosseum in Rome, Italy" />
@@ -38,7 +38,7 @@
         </div>
     </div>
     <div class="about">
-        <h1>About Christian</h1>
+        <h1 id="christian">About Christian</h1>
         <div class="aboutcontent">
             <div class="about_images">
                 <!--<img src="/static/images/about/portrait4.jpg" alt="Me enjoying the sun at Ottenstein Stausee" />-->

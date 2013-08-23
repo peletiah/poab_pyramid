@@ -374,6 +374,19 @@ body a:hover {
     margin:1em 0;
 }
 
+.author {
+    margin: -1.5em 0 1em 0;
+    font-size: 0.7em;
+}
+
+.author a {
+    text-decoration: none;
+}
+
+.author a:hover {
+    text-decoration: underline;
+    color:#FFF;
+}
 
 .logfooter {
         height: 3em;

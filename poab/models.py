@@ -77,6 +77,7 @@ class Author(Base):
     name = Column("name", types.UnicodeText, unique=True)
     password = Column(Unicode(80), nullable=False)
     uuid = Column("uuid", postgresql.UUID, unique=True)
+    displayname = Column("displayname", types.UnicodeText, unique=True)
     group = relationship('Group', secondary=author_group_table, backref='memberships')
     author_log = relationship('Log', backref='author_log_ref')
     author_img = relationship('Image', backref='author_img_ref')

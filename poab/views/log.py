@@ -231,7 +231,7 @@ def log_view(request):
             return urlfinder2.sub(r' <\1>', value)
         log_content_display=markdown.markdown(urlify_markdown(log_content_display))
         class Logdetails(object):
-                def __init__(self, topic, twitter, guid, localtime, content, rounded_distance, timezone, timespan, country, continent, lasttrkpt, infomarker, log, gallerylink):
+                def __init__(self, topic, twitter, guid, localtime, content, rounded_distance, timezone, timespan, country, continent, lasttrkpt, infomarker, log, gallerylink, author):
                     self.topic=topic
                     self.twitter=twitter
                     self.guid=guid
@@ -252,7 +252,8 @@ def log_view(request):
                     self.infomarkerid=log.trackpoint_log_ref.id
                     self.id=log.id
                     self.gallerylink=gallerylink
-        logdetails = Logdetails(log.topic, twitter, guid, localtime, log_content_display, rounded_distance, timezone, timespan, country, continent, log.trackpoint_log_ref, log.trackpoint_log_ref, log, gallerylink) #TODO: "log.trackpoint_log_ref, log.trackpoint_log_ref" was originally "infomarker, lasttrkpt"
+                    self.author = log.author_log_ref
+        logdetails = Logdetails(log.topic, twitter, guid, localtime, log_content_display, rounded_distance, timezone, timespan, country, continent, log.trackpoint_log_ref, log.trackpoint_log_ref, log, gallerylink, log.author) #TODO: "log.trackpoint_log_ref, log.trackpoint_log_ref" was originally "infomarker, lasttrkpt"
         logdetaillist.append(logdetails)
 
     return {
