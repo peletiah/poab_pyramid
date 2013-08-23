@@ -159,7 +159,7 @@ def view_view(request):
         deltaseconds=round(timezone.utcoffset.days*86400+timezone.utcoffset.seconds)
         #TODO THIS SUCKS!
         class Viewdetail(object):
-            def __init__(self, image, photoid, name, location, title, comment, alt, aperture, shutter, focal_length, iso, trackpointinfo, localtime, timezone, utcoffset, log):
+            def __init__(self, image, photoid, name, location, title, comment, alt, aperture, shutter, focal_length, iso, trackpointinfo, localtime, timezone, utcoffset, log, author):
                 self.image = image
                 self.photoid=photoid
                 self.name=name
@@ -178,7 +178,8 @@ def view_view(request):
                 #calculate the offset in seconds
                 self.utcoffset=utcoffset
                 self.log = log
-        viewdetail = Viewdetail(image, image.id, image.name, image.location.replace('/srv',''), image.title, image.comment, image.alt, image.aperture, image.shutter, image.focal_length, image.iso, trackpointinfo, localtime.strftime('%Y-%m-%d %H:%M:%S'), timezone, timediff(deltaseconds), image.log)
+                self.author = image.author_img_ref
+        viewdetail = Viewdetail(image, image.id, image.name, image.location.replace('/srv',''), image.title, image.comment, image.alt, image.aperture, image.shutter, image.focal_length, image.iso, trackpointinfo, localtime.strftime('%Y-%m-%d %H:%M:%S'), timezone, timediff(deltaseconds), image.log, image.author)
         viewlist.append(viewdetail)
 
     return {

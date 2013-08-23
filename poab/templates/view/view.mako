@@ -18,10 +18,15 @@ ${pages.pages()}
     <a rel="map_colorbox" href="/track/simple/${viewdetail.trackpointinfo.id}/${viewdetail.photoid}" title="View photolocation on map"><img class="image" src="/static${viewdetail.location}990/${viewdetail.name}" /></a>
     <div class="caption">
          <span class="caption_left">
-            % if viewdetail.image.image_flickr_ref:
+            % if viewdetail.image.image_flickr_ref and viewdetail.author.name == 'christian':
             <span>&#8594;</span>
             <a href="http://www.flickr.com/peletiah/${viewdetail.image.image_flickr_ref[0].photoid}" target="_blank" title="View photo on flickr">www.flickr.com</a><br />
             % endif
+            % if viewdetail.image.image_flickr_ref and viewdetail.author.name == 'daniela':
+            <span>&#8594;</span>
+            <a href="http://www.flickr.com/liveones/${viewdetail.image.image_flickr_ref[0].photoid}" target="_blank" title="View photo on flickr">www.flickr.com</a><br />
+            % endif
+
             <span>&#8594;</span>
             <a rel="map_colorbox" href="/track/simple/${viewdetail.trackpointinfo.id}/${viewdetail.photoid}" title="View photolocation on map">view on map</a>
         </span>

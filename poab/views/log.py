@@ -199,16 +199,22 @@ def log_view(request):
                 print '\n\n'
                 print '\n\n'
                 if image.comment:
+                    #TODO: flickr-nickname to author-name missing
+                    flickr_name = 'peletiah'
+                    if log.author_log_ref.name == 'christian':
+                        flickr_name = 'peletiah'
+                    elif log.author_log_ref.name == 'daniela':
+                        flickr_name = 'liveones'
                     print image.id
                     inlineimage='''<div class="log_inlineimage"><div class="imagecontainer"><a href="%s%s%s" title="%s" rel="image_colorbox"><img class="inlineimage" src="%s%s%s%s" alt="%s" /></a><div class="caption">
         <span>&#8594;</span>
-            <a href="http://www.flickr.com/peletiah/%s" target="_blank">www.flickr.com</a>
-    </div></div><span class="imagedescription">%s</span></div>''' % ('/static', image.location.replace('/srv',''), image.name, image.title, '/static', image.location.replace('/srv',''), '500/', image.name, image.alt, image.image_flickr_ref[0].photoid, image.comment)
+            <a href="http://www.flickr.com/%s/%s" target="_blank">www.flickr.com</a>
+    </div></div><span class="imagedescription">%s</span></div>''' % ('/static', image.location.replace('/srv',''), image.name, image.title, '/static', image.location.replace('/srv',''), '500/', image.name, image.alt, flickr_name, image.image_flickr_ref[0].photoid, image.comment)
                 else:
                     inlineimage='''<div class="log_inlineimage"><div class="imagecontainer"><a href="%s%s%s" title="%s" rel="image_colorbox" ><img class="inlineimage" src="%s%s%s%s" alt="%s" /></a><div class="caption">
         <span>&#8594;</span>
-            <a href="http://www.flickr.com/peletiah/%s" target="_blank">www.flickr.com</a>
-    </div></div></div>''' % ('/static', image.location.replace('/srv',''), image.name, image.title, '/static', image.location.replace('/srv',''), '500/', image.name, image.alt, image.image_flickr_ref[0].photoid) #TODO breaks when no flickr-info in db
+            <a href="http://www.flickr.com/%s/%s" target="_blank">www.flickr.com</a>
+    </div></div></div>''' % ('/static', image.location.replace('/srv',''), image.name, image.title, '/static', image.location.replace('/srv',''), '500/', image.name, image.alt, flickr_name, image.image_flickr_ref[0].photoid) #TODO breaks when no flickr-info in db
 
                 #flickrlink_large = 'http://farm%s.static.flickr.com/%s/%s_%s_b.jpg' % (imageinfo.flickrfarm,imageinfo.flickrserver,imageinfo.flickrphotoid,imageinfo.flickrsecret)
                 ##image_large = '/static%s' % (imageinfo.imgname) #TODO from flickr or local?
