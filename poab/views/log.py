@@ -199,6 +199,7 @@ def log_view(request):
                 print '\n\n'
                 print '\n\n'
                 if image.comment:
+                    print image.id
                     inlineimage='''<div class="log_inlineimage"><div class="imagecontainer"><a href="%s%s%s" title="%s" rel="image_colorbox"><img class="inlineimage" src="%s%s%s%s" alt="%s" /></a><div class="caption">
         <span>&#8594;</span>
             <a href="http://www.flickr.com/peletiah/%s" target="_blank">www.flickr.com</a>

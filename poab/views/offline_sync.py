@@ -55,27 +55,43 @@ import uuid, re
 @view_config(route_name='sync', request_param='type=status')
 def itemstatus(request):
     sync_status='sync_error'
-    image_json = json.loads(request.POST.get('image_json'))
+    payload_type = request.POST.get('payloadtype')
+    print '\n\n\n\n\n\n\n\n\n\n'
+    print payload_type
+    print '\n\n\n\n\n\n\n\n\n\n'
     log_json = json.loads(request.POST.get('log_json'))
+    if payload_type == 'image':
+        image_json = json.loads(request.POST.get('image_json'))
+        payload_uuid = image_json['uuid']
 
-    image = Image.get_image_by_uuid(image_json['uuid'])
+        image = Image.get_image_by_uuid(image_json['uuid'])
 
-    if image:
-        print 'Image found! '+image.location
+        if image:
+            print 'Image found! '+image.location
 
-        image_bin = open(image.location+image.name, 'rb')
-        hash=hashlib.sha256(image_bin.read()).hexdigest()
+            image_bin = open(image.location+image.name, 'rb')
+            hash=hashlib.sha256(image_bin.read()).hexdigest()
 
-        if hash == image.hash == image_json['hash']:
-            print 'Image already exists on server!'
-            sync_status='was_synced'
+            if hash == image.hash == image_json['hash']:
+                print 'Image already exists on server!'
+                sync_status='was_synced'
 
+            else:
+                print 'Imagehash mismatch!'
+                sync_status='sync_error'
         else:
-            print 'Imagehash mismatch!'
-            sync_status='sync_error'
-    else:
-        sync_status = 'not_synced'
-    return Response(json.dumps({'log_id':log_json['id'],'type':'image',  'item_uuid':image_json['uuid'], 'sync_status':sync_status}))
+            sync_status = 'not_synced'
+    elif payload_type == 'track':
+        track_json = json.loads(request.POST.get('track_json'))
+        track = Track.get_track_by_uuid(track_json['uuid'])
+        payload_uuid = track_json['uuid']
+        if track:
+            print 'Track already exists on server!'
+            sync_status='was_synced'    
+        else:
+            print 'Track not on server'
+            sync_status = 'not_synced'
+    return Response(json.dumps({'log_id':log_json['id'],'type':payload_type,  'item_uuid':payload_uuid, 'sync_status':sync_status}))
 
 
 
@@ -307,7 +323,10 @@ def interlink_image(request):
     print image_json['name']
     print image_json['trackpoint']
     image = Image.get_image_by_uuid(image_json['uuid'])
-    trackpoint = Trackpoint.get_trackpoint_by_uuid(image_json['trackpoint']['uuid'])
+    try:
+        trackpoint = Trackpoint.get_trackpoint_by_uuid(image_json['trackpoint']['uuid'])
+    except:
+        trackpoint = None
     location = None
     if trackpoint:
         image.trackpoint = trackpoint.id
