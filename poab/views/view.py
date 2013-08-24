@@ -103,9 +103,9 @@ def view_view(request):
         #q = DBSession.query(Trackpoint).filter(and_(Trackpoint.id==id))
         #images=fetch_images_for_trackpoints(q)
         log = DBSession.query(Log).filter(Log.id==id).one()
-        images = DBSession.query(Image).filter(Image.logs.contains(log))
+        images = DBSession.query(Image).filter(Image.logs.contains(log)).order_by(Image.timestamp_original).all()
     elif action=='id':
-        images = DBSession.query(Image).filter(Image.id==id).all()
+        images = DBSession.query(Image).filter(Image.id==id).order_by(Image.timestamp_original).all()
     page_list=list()
     pages_list=list()
     i=0
