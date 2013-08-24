@@ -198,14 +198,14 @@ def log_view(request):
                 print image.location
                 print '\n\n'
                 print '\n\n'
-                if image.comment:
-                    #TODO: flickr-nickname to author-name missing
+                flickr_name = 'peletiah'
+                #TODO: flickr-nickname to author-name missing
+                if log.author_log_ref.name == 'christian':
                     flickr_name = 'peletiah'
-                    if log.author_log_ref.name == 'christian':
-                        flickr_name = 'peletiah'
-                    elif log.author_log_ref.name == 'daniela':
-                        flickr_name = 'liveones'
-                    print image.id
+                elif log.author_log_ref.name == 'daniela':
+                    flickr_name = 'liveones'
+                print image.id
+                if image.comment:
                     inlineimage='''<div class="log_inlineimage"><div class="imagecontainer"><a href="%s%s%s" title="%s" rel="image_colorbox"><img class="inlineimage" src="%s%s%s%s" alt="%s" /></a><div class="caption">
         <span>&#8594;</span>
             <a href="http://www.flickr.com/%s/%s" target="_blank">www.flickr.com</a>
