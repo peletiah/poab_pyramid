@@ -30,3 +30,7 @@ pip-log.txt
 
 #Mr Developer
 .mr.developer.cfg
+
+*.jpg
+*.JPG
+*.jpeg

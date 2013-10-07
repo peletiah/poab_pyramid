@@ -234,17 +234,19 @@ class Log(Base):
     author = Column(Integer, ForeignKey('author.id',onupdate="CASCADE", ondelete="CASCADE"))
     etappe = Column(Integer, ForeignKey('etappe.id', onupdate="CASCADE", ondelete="CASCADE"))
     created = Column("created", types.TIMESTAMP(timezone=False),default=timetools.now())
+    published = Column("published", types.TIMESTAMP(timezone=False),default=timetools.now())
     uuid = Column("uuid", postgresql.UUID, unique=True)
     image = relationship('Image', secondary=log_image_table, backref='logs')
     track = relationship('Track', secondary=log_track_table, backref='logs')
 
-    def __init__(self, infomarker, topic, content, author, etappe, created, uuid):
+    def __init__(self, infomarker, topic, content, author, etappe, created, published, uuid):
         self.infomarker = infomarker
         self.topic = topic
         self.content = content
         self.author = author
         self.etappe = etappe
         self.created = created
+        self.published = published
         self.uuid = uuid
 
     @classmethod
