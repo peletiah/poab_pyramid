@@ -242,7 +242,10 @@ def log_view(request):
                     self.twitter=twitter
                     self.guid=guid
                     self.created=localtime.strftime('%B %d, %Y')
-                    self.published=log.published.strftime('%B %d, %Y')
+                    if log.published:
+                        self.published=log.published.strftime('%B %d, %Y')
+                    else:
+                        self.published=None
                     self.content=content
                     try:
                         self.distance=rounded_distance

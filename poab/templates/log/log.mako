@@ -46,7 +46,12 @@ ${pages.pages()}
                 </div>
                 <div class="logcontent">
                     <h2><a href="/log/id/${log.id}" title="Permanent link to this journal-entry">${log.topic}</a></h2>
-                    <div class="author">by <a href="about#${log.author.name}">${log.author.displayname}</a>, published on ${log.published}</div>
+                    <div class="author">by <a href="about#${log.author.name}">${log.author.displayname}</a>
+                    % if log.published==None:
+                      </div>
+                    % else:
+                      , published on ${log.published}</div>
+                    % endif
                     <h3>
                     % if log.distance==None:
                         
