@@ -126,6 +126,7 @@ def logsync(request):
                 author=author.id,
                 etappe=etappe.id,
                 created=log_json['created'],
+                published=timetools.now(),
                 uuid=log_json['uuid']
                 )
         DBSession.add(log)
