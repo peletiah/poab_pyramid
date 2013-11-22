@@ -16,6 +16,9 @@ from sqlalchemy import and_
 
 from datetime import timedelta
 import time,datetime, json
+from json import encoder
+encoder.FLOAT_REPR = lambda o: format(o, '.7f') #render 7 digits behind the comma with json.dump
+#http://stackoverflow.com/questions/1447287/format-floats-with-standard-json-module
 
 from decimal import Decimal, ROUND_HALF_UP
 
@@ -33,6 +36,7 @@ def generate_json_from_tracks(tracks):
             color='#'+row.color
             reduced_track = list()
             print row.reduced_trackpoints 
+            print '\n\nROW.REDUCED_TRACKPOINTS\n\n'
             features.append(
                 (dict(
                 type='Feature', 
@@ -48,7 +52,9 @@ def generate_json_from_tracks(tracks):
                     color = color
                     ),
                 )))
-            print features
+            print type(features[0]['geometry']['coordinates'][0][0])
+            print json.dumps(features[0]['geometry']['coordinates'][0][0])
+            print '\n\nFEATURES\n\n'
     tracks_json = 'OpenLayers.Protocol.Script.registry.c1('+json.dumps(dict(type='FeatureCollection', features=features))+')'
     print tracks_json
     return tracks_json
@@ -72,7 +78,7 @@ def json_track_view(request):
         id=0
     if action=='c' and id==0:
         after_date = datetime.datetime.strptime('2010-09-02',"%Y-%m-%d")
-        before_date = datetime.datetime.strptime('2013-12-07', "%Y-%m-%d")
+        before_date = datetime.datetime.strptime('2013-01-07', "%Y-%m-%d")
         curr_date = after_date
         tracks = DBSession.query(Track).filter(and_(Track.start_time > after_date, Track.id != 141)).all()
         response = Response(generate_json_from_tracks(tracks))
