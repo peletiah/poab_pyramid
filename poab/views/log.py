@@ -38,12 +38,37 @@ from poab.models import (
     Continent
     )
 
-import re
+import re,os
 
+_here = os.path.dirname(__file__)
+
+# _icon = /app/location/myapp/static/favicon.ico
+
+_icon = open(os.path.join(
+             _here, '../static', 'favicon.ico')).read()
+_fi_response = Response(content_type='image/x-icon',
+                        body=_icon)
+
+# _robots = /app/location/myapp/static/robots.txt
+
+_robots = open(os.path.join(
+               _here, '../static', 'robots.txt')).read()
+_robots_response = Response(content_type='text/plain',
+                            body=_robots)
+
+@view_config(name='favicon.ico')
+def favicon_view(context, request):
+    return _fi_response
+
+@view_config(name='robots.txt')
+def robotstxt_view(context, request):
+    return _robots_response
 
 @view_config(
     route_name='home'
 )
+
+
 def home(request):
     raise HTTPFound(request.route_url("log"))
 
@@ -85,8 +110,8 @@ def log_view(request):
         q = DBSession.query(Log).order_by(Log.created)
         log_count = q.count()
         page_fract=float(Fraction(str(log_count)+'/3'))
-        print '\n\n\n PAGE FRACT'
-        print page_fract
+        #print '\n\n\n PAGE FRACT'
+        #print page_fract
         if int(str(page_fract).split('.')[1])==0:
             page=int(str(page_fract).split('.')[0])-1
         else:               
@@ -112,7 +137,7 @@ def log_view(request):
             trackpoints.append(trackpoint)
         logs = list()
         for trackpoint in trackpoints:
-            print trackpoint
+            #print trackpoint
             log = DBSession.query(Log).filter(Log.trackpoint_log_ref==trackpoint).all()
             logs.append(log)            
     elif action=='id': 
@@ -135,18 +160,18 @@ def log_view(request):
     for log in pages_list[curr_page]:
         twitter = False
         guid = None
-        print log.trackpoint_log_ref
+        #print log.trackpoint_log_ref
         # ###query for last trackpoint
         ##q = DBSession.query(Trackpoint).filter(and_(Trackpoint.track_id==infomarker.track_id,Trackpoint.id==infomarker.id)).order_by(asc(Trackpoint.timestamp))
         ##lasttrkpt=q.first()
         # ###query if images exist for the log
-        print log.images
+        #print log.images
         if len(log.images) > 0:
             #creates the infomarker-image_icon-and-ajax-link(fancy escaping for js needed):
             gallerylink="""<span class="image_icon"><a title="Show large images related to this entry" href="/view/log/%s/0"></a></span>""" % (log.id)
         else:
             gallerylink=''
-        print log.tracks
+        #print log.tracks
         if len(log.tracks) > 0:
             # ###calculate duration from track-info
             total_seconds = 0
@@ -159,7 +184,7 @@ def log_view(request):
             hours = total_minutes / 60
             timespan = str(hours)+'h '+str(mins)+'min'
             rounded_distance=str(total_distance.quantize(Decimal("0.01"), ROUND_HALF_UP))+'km'
-            print timespan, rounded_distance
+            #print timespan, rounded_distance
         else:
             rounded_distance=None
             timespan=None
@@ -183,28 +208,28 @@ def log_view(request):
             twitter=True
         log_content_display=log.content
         imgidtags=re.findall('\[imgid=[0-9]*\]',log_content_display)
-        print '\n\n'
-        print imgidtags
+        #print '\n\n'
+        #print imgidtags
         for imgidtag in imgidtags:
-                print imgidtag
+                #print imgidtag
                 image_id=re.search("^\[imgid=(\d{1,})\]$",imgidtag).group(1)
-                print image_id
+                #print image_id
                 #imageinfo_id=imgidtag[6:-1]
                 q = DBSession.query(Image).filter(Image.id==image_id)
                 image = q.one()
-                print image
-                print '\n\n'
-                print '\n\n'
-                print image.location
-                print '\n\n'
-                print '\n\n'
+                #print image
+                #print '\n\n'
+                #print '\n\n'
+                #print image.location
+                #print '\n\n'
+                #print '\n\n'
                 flickr_name = 'peletiah'
                 #TODO: flickr-nickname to author-name missing
                 if image.author_img_ref.name == 'christian':
                     flickr_name = 'peletiah'
                 elif image.author_img_ref.name == 'daniela':
                     flickr_name = 'liveones'
-                print image.id
+                #print image.id
                 if image.comment:
                     inlineimage='''<div class="log_inlineimage"><div class="imagecontainer"><a href="%s%s%s" title="%s" rel="image_colorbox"><img class="inlineimage" src="%s%s%s%s" alt="%s" /></a><div class="caption">
         <span>&#8594;</span>

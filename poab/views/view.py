@@ -92,9 +92,9 @@ def view_view(request):
         #q = DBSession.query(Trackpoint)
         #images=fetch_images_for_trackpoints(q)
         images=Image.get_images()
-        print '\n\n\n\n\n'
-        print images
-        print '\n\n\n\n\n'
+        #print '\n\n\n\n\n'
+        #print images
+        #print '\n\n\n\n\n'
     elif action=='c':
         #q = DBSession.query(Trackpoint).filter(and_(Trackpoint.country_id==id))
         #images=fetch_images_for_trackpoints(q)
@@ -121,10 +121,10 @@ def view_view(request):
         page_list.reverse()
         pages_list.append(page_list)
     viewlist=list()
-    print page_list
-    print pages_list
-    print curr_page
-    print pages_list[curr_page]
+    #print page_list
+    #print pages_list
+    #print curr_page
+    #print pages_list[curr_page]
     for image in pages_list[curr_page]:
         if image.trackpoint:
             trackpoint_id=image.trackpoint
@@ -134,8 +134,8 @@ def view_view(request):
         q = DBSession.query(Trackpoint).filter(Trackpoint.id==trackpoint_id)
         try:
             trackpointinfo=q.one()
-            print '\n\n\n\n'
-            print trackpointinfo.location_ref[0].name
+            #print '\n\n\n\n'
+            #print trackpointinfo.location_ref[0].name
         except:
             trackpointinfo = Trackpoint(
                                     track_id = None,
@@ -149,8 +149,8 @@ def view_view(request):
                                     timestamp = None,
                                     uuid = None
                                     )
-        print image.location.replace('/srv','')
-        print '\n\n\n\n'
+        #print image.location.replace('/srv','')
+        #print '\n\n\n\n'
         ##TODO: fix timezone
         ##q = DBSession.query(Timezone).filter(Timezone.id==trackpointinfo.timezone_id)
         q = DBSession.query(Timezone).filter(Timezone.id==8)

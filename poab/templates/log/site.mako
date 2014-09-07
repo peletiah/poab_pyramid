@@ -2,7 +2,7 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-        <meta name="description" content="A 8000km bicycle ride through the Balkan, Anatolia, Persia, Balochistan and India" />
+        <meta name="description" content="A 8000km bicycle ride through the Balkan, Anatolia, Persia, Central Asia and India" />
         <link href="/static/css/caption.css" media="screen" rel="stylesheet" title="" type="text/css"/>
         <link rel="shortcut icon" href="/static/images/bicycle.ico" />
 	<title>poab.org - journal</title>

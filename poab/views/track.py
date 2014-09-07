@@ -35,8 +35,8 @@ def generate_json_from_tracks(tracks):
             date=row.start_time.strftime('%B %d, %Y')
             color='#'+row.color
             reduced_track = list()
-            print row.reduced_trackpoints 
-            print '\n\nROW.REDUCED_TRACKPOINTS\n\n'
+            #print row.reduced_trackpoints 
+            #print '\n\nROW.REDUCED_TRACKPOINTS\n\n'
             features.append(
                 (dict(
                 type='Feature', 
@@ -52,11 +52,11 @@ def generate_json_from_tracks(tracks):
                     color = color
                     ),
                 )))
-            print type(features[0]['geometry']['coordinates'][0][0])
-            print json.dumps(features[0]['geometry']['coordinates'][0][0])
-            print '\n\nFEATURES\n\n'
+            #print type(features[0]['geometry']['coordinates'][0][0])
+            #print json.dumps(features[0]['geometry']['coordinates'][0][0])
+            #print '\n\nFEATURES\n\n'
     tracks_json = 'OpenLayers.Protocol.Script.registry.c1('+json.dumps(dict(type='FeatureCollection', features=features))+')'
-    print tracks_json
+    #print tracks_json
     return tracks_json
 
 def generate_json_from_trackpoint(trackpoint):

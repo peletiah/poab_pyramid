@@ -49,7 +49,7 @@ import re
     renderer='rss/rss.mako',
 )
 def rss_view(request):
-    logs = DBSession.query(Log).order_by(desc(Log.created)).limit(20)
+    logs = DBSession.query(Log).filter(Log.id != 508).order_by(desc(Log.created)).limit(20)
     logdetaillist=list()
     for log in logs:
         twitter = False

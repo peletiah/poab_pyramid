@@ -330,6 +330,8 @@ def interlink_image(request):
         trackpoint = None
     location = None
     if trackpoint:
+        print trackpoint
+        print image
         image.trackpoint = trackpoint.id
     #Get location for image.trackpoint
         location = Location(name = None, trackpoint_id = None, country_id = None)
