@@ -7,6 +7,8 @@ import atexit
 from pyramid.config import Configurator
 from sqlalchemy import engine_from_config
 
+from pyramid.paster import bootstrap
+from pyramid.request import Request
 
 from poab.models import DBSession
 
@@ -49,8 +51,8 @@ class SQLAlchemyShell(InteractiveConsole):
         readline.write_history_file(histfile)
 
 
-engine=engine_from_config({'sqlalchemy.url':'postgresql://poab:<password>@localhost/poab_new'}, 'sqlalchemy.')
-#engine=engine_from_config({'sqlalchemy.url':'sqlite:///home/benke/env/poab_editor/poab_editor.db'}, 'sqlalchemy.')
+env = bootstrap('../development.ini')
+engine=engine_from_config(env['registry'].settings, 'sqlalchemy.')
 DBSession.configure(bind=engine)
 ic = SQLAlchemyShell()
 cmd = "from poab.models import *"
