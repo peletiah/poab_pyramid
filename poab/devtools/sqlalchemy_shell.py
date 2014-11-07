@@ -10,6 +10,8 @@ from sqlalchemy import engine_from_config
 from pyramid.paster import bootstrap
 from pyramid.request import Request
 
+from poab.models import DBSession
+
 class SQLAlchemyShell(InteractiveConsole):
     """A subclass of the code.InteractiveConsole class, adding a history file
     and readline support.

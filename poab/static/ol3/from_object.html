@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link rel="stylesheet" href="/static/ol3/ol3.css" type="text/css">
+    <link rel="stylesheet" href="/static/ol3/map.css" type="text/css">
+    <script src="/static/ol3/ol.js" type="text/javascript"></script>
+    <title>triplog - testmap</title>
+  </head>
+
+  <body>
+    <div id="map" class="map">
+    </div>
+    <script type="text/javascript">
+     var turkey = '{"type": "FeatureCollection", "features": [{"geometry": {"type": "MultiLineString", "coordinates": [[[39.9268576, 38.6911456], [39.9384448, 38.6969568]], [[39.9396768, 38.6978944], [39.9396768, 38.6978944]], [[39.9396064, 38.6979072], [39.9267648, 38.691008], [39.9562464, 38.6909056], [39.9626464, 38.7017088], [40.0179488, 38.7103552], [40.0555488, 38.7252224]], [[40.0562528, 38.7256], [40.0750784, 38.7335008], [40.1044032, 38.7258368], [40.1193856, 38.731488]]]}, "type": "Feature", "properties": {"zoomlevel": "tour 1", "center": [40.0069612902174, 38.7109091521739]}}]}'
+     
+     var iran = '{"type": "FeatureCollection", "features": [{"geometry": {"type": "MultiLineString", "coordinates": [[[51.4888608, 36.0062176], [51.4933952, 36.011936], [51.4863008, 36.013104], [51.4819488, 36.030368], [51.4778528, 36.0248576], [51.4580992, 36.0366016], [51.4328384, 36.0371904], [51.4054304, 36.0625952], [51.3898848, 36.063584], [51.3874784, 36.0759264]], [[51.3875744, 36.075808], [51.3269952, 36.1142624]], [[51.3269952, 36.1142624], [51.3168672, 36.1202688], [51.325568, 36.1307456], [51.3184736, 36.1268928], [51.3069728, 36.140784], [51.3209792, 36.1956992], [51.338208, 36.1987424], [51.3292192, 36.2105664], [51.3138912, 36.212368], [51.3211936, 36.2123296], [51.3074112, 36.226272], [51.3151552, 36.2322016], [51.303776, 36.2340576], [51.3008928, 36.2459968], [51.2455744, 36.27048], [51.2391968, 36.2898496], [51.2484512, 36.300704], [51.26152, 36.3654624], [51.2756416, 36.3812992], [51.278832, 36.4142528], [51.300144, 36.4526848]], [[51.2928288, 36.4556], [51.3061088, 36.4595008], [51.3358816, 36.5245632], [51.374928, 36.5607552], [51.3883808, 36.6170336], [51.4091904, 36.6311584], [51.4300928, 36.675072], [51.439568, 36.6789856]]]}, "type": "Feature", "properties": {"zoomlevel": "tour 2", "center": [51.3791035441058, 36.2496912788375]}}]}'
+     
+     
+     var styleMotor = new ol.style.Style({
+         stroke: new ol.style.Stroke({
+             color: 'rgba(255,0,0,1)',
+             width: 4
+         })
+     })
+     
+     
+     // LAYERS
+     // --------------------------------------------
+     
+     
+     
+     var natural = new ol.layer.Tile({
+         source: new ol.source.TileJSON({
+             url: 'http://api.tiles.mapbox.com/v3/' +
+                 'mapbox.natural-earth-hypso-bathy.jsonp',
+             crossOrigin: 'anonymous'
+         })
+     })
+     
+     
+     // MAP SETUP
+     // --------------------------------------------
+     
+     
+     
+     var view = new ol.View({
+         center: [5719495.643944736, 4335033.122424604],
+         zoom: 6
+     });
+     
+     var map = new ol.Map({
+         target: 'map',
+         layers: [natural],
+         view: view,
+     });
+     
+     
+     var source = new ol.source.GeoJSON({
+         projection: 'EPSG:3857',
+         object: iran
+     });
+    
+    
+ 
+   
+     var tracks = new ol.layer.Vector({
+         source: source,
+         style: styleMotor,
+     });
+
+     map.addLayer(tracks)
+    
+     var newsource = new ol.source.GeoJSON({
+         projection: 'EPSG:3857',
+         object: turkey
+     })
+    
+     source.addFeatures(newsource.getFeatures());
+     
+    </script>
+
+
+  </body>
+</html>
+
+
