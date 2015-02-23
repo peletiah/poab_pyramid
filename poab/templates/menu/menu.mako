@@ -1,4 +1,5 @@
 <%namespace name="hostname" file="/misc/hostname.mako"/>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="alternate" type="application/atom+xml" href="http://poab.org/feed" title="POAB.org - World Cycle Blog" />
 <link rel="stylesheet" type="text/css" href="/static/css/main.css" media="screen">
 <link type="text/css" rel="Stylesheet" media="screen" href="/static/css/flora.datepicker.css"/>

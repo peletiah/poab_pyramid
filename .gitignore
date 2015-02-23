@@ -6,6 +6,11 @@
 
 *.ini
 *.ini
+*.zip
+
+*.pdf
+
+hilleberg
 
 # Packages
 *.egg
