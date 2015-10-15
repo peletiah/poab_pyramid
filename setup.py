@@ -18,7 +18,8 @@ requires = [
     'flickrapi',
     'markdown',
     'psycopg2',
-    'lxml'
+    'lxml',
+    'passlib'
     ]
 
 setup(name='poab',
