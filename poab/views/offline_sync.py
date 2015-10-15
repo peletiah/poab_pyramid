@@ -148,7 +148,7 @@ def imagesync(request):
     print request.POST.keys()
     image_json = request.POST.get('image_json')
     log_json = json.loads(request.POST.get('log').value)
-    #image_bin = request.POST.get('image_bin')
+    image_bin = request.POST.get('image_bin')
 
     image_json = json.loads(image_json.value)
     author = Author.get_author(image_json['author']['name'])
@@ -165,7 +165,7 @@ def imagesync(request):
         filedir = filetools.createdir(basedir, author.name, datepath)
         imgdir = filedir+'images/sorted/'
 
-        #filehash = filetools.safe_file(imgdir, image_json['name'], image_bin.value)
+        filehash = filetools.safe_file(imgdir, image_json['name'], image_bin.value)
 
         imagetools.resize(imgdir, imgdir+img_prvw_w+'/', image_json['name'], img_prvw_w)
         imagetools.resize(imgdir, imgdir+img_large_w+'/',image_json['name'] , img_large_w) #TODO: what happens when a 990px-wide img was uploaded?
@@ -276,7 +276,9 @@ def interlink_log(request):
     #Link to Tracks
     for track in log_json['tracks']:
         track = Track.get_track_by_uuid(track['uuid'])
+        print '############### track.id #########'
         print track.id
+        print '################ track.id end #########'
         log.track.append(track)
         #find the latest trackpoint-timestamp related to this log
         #this will be the trackpoint linked to log as infomarker

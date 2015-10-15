@@ -74,6 +74,8 @@ def findplace(lat,lon,accuracy, author):
 def get_country_by_lat_lon(lat,lon,author):
     accuracy=1 #level of region-detail in flickr, 1 is world, 8 is district
     flickr_countryname=findplace(lat,lon,accuracy,author)
+    if len(flickr_countryname.split(',')) > 1:
+            flickr_countryname=flickr_countryname.split(',')[-1].replace(' ','')
     print "flickr_countryname: "+str(flickr_countryname)
     if flickr_countryname !=None:
         country=DBSession.query(Country).filter(Country.flickr_countryname==flickr_countryname).one()
