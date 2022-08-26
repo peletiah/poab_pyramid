@@ -19,7 +19,8 @@ requires = [
     'markdown',
     'psycopg2',
     'lxml',
-    'passlib'
+    'passlib',
+    'pyramid_mako'
     ]
 
 setup(name='poab',

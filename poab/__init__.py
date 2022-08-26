@@ -9,7 +9,9 @@ def main(global_config, **settings):
     engine = engine_from_config(settings, 'sqlalchemy.')
     DBSession.configure(bind=engine)
     config = Configurator(settings=settings)
+    config.include('pyramid_mako')
     config.add_static_view('static', 'static', cache_max_age=3600)
+    config.add_static_view('.well-known', '.well-known', cache_max_age=0)
     config.add_route('home', '/')
     config.add_route('log', '/log')
     config.add_route('log:action', '/log/{action}/{id}{page:.*}')
@@ -30,6 +32,7 @@ def main(global_config, **settings):
     config.add_route('feed', '/feed')
     config.add_route('rss', '/rss')
     config.add_route('copy_db', '/cd')
+    config.add_route('record_highscore:score', '/record_highscore/{score}')
     config.scan()
     return config.make_wsgi_app()
 

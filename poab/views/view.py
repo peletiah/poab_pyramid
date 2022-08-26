@@ -106,6 +106,9 @@ def view_view(request):
         images = DBSession.query(Image).filter(Image.logs.contains(log)).order_by(Image.timestamp_original).all()
     elif action=='id':
         images = DBSession.query(Image).filter(Image.id==id).order_by(Image.timestamp_original).all()
+
+    elif action=='infomarker':
+        images = DBSession.query(Image).filter(Image.trackpoint==id).order_by(Image.timestamp_original).all()
     page_list=list()
     pages_list=list()
     i=0
@@ -125,6 +128,8 @@ def view_view(request):
     #print pages_list
     #print curr_page
     #print pages_list[curr_page]
+    if len(pages_list) < curr_page:
+        curr_page=len(pages_list)-1
     for image in pages_list[curr_page]:
         if image.trackpoint:
             trackpoint_id=image.trackpoint

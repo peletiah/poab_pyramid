@@ -107,7 +107,7 @@ def log_view(request):
     except:
         page_number=None
     if id==0 and page_number==None:
-        q = DBSession.query(Log).order_by(Log.published)
+        q = DBSession.query(Log).order_by(Log.created)
         log_count = q.count()
         page_fract=float(Fraction(str(log_count)+'/3'))
         #print '\n\n\n PAGE FRACT'
@@ -128,7 +128,7 @@ def log_view(request):
         ##trackpoints = DBSession.query(Trackpoint).filter(Trackpoint.infomarker==True).all()
         ##country_id=id
         ##logs=get_logs_by_trackpoints(trackpoints)
-        logs = DBSession.query(Log).order_by(Log.published).all()
+        logs = DBSession.query(Log).order_by(Log.created).all()
     elif action=='c':
         locations = DBSession.query(Location).filter(Location.country_id==id).all()
         trackpoints = list()
@@ -141,7 +141,7 @@ def log_view(request):
             log = DBSession.query(Log).filter(Log.trackpoint_log_ref==trackpoint).all()
             logs.append(log)            
     elif action=='id': 
-        logs = DBSession.query(Log).filter(Log.id==id).order_by(Log.published).all()
+        logs = DBSession.query(Log).filter(Log.id==id).order_by(Log.created).all()
     page_list=list()
     pages_list=list()
     i=0
@@ -157,6 +157,8 @@ def log_view(request):
         page_list.reverse()
         pages_list.append(page_list)
     logdetaillist=list()
+    if len(pages_list) < curr_page:
+        curr_page = len(pages_list)-1
     for log in pages_list[curr_page]:
         twitter = False
         guid = None
@@ -213,9 +215,9 @@ def log_view(request):
         for imgidtag in imgidtags:
                 #print imgidtag
                 image_id=re.search("^\[imgid=(\d{1,})\]$",imgidtag).group(1)
-                print '###############################'
-                print image_id
-                print '###############################'
+                #print '###############################'
+                #print image_id
+                #print '###############################'
                 #imageinfo_id=imgidtag[6:-1]
                 q = DBSession.query(Image).filter(Image.id==image_id)
                 image = q.one()

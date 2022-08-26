@@ -5,5 +5,6 @@ def resize(fullsizepath,resizepath,imagename,width):
         pass
     else:
         os.mkdir(resizepath)
+    print "/usr/bin/convert "+fullsizepath+"/"+imagename+" -resize "+width+" "+resizepath+"/"+imagename
     os.system("/usr/bin/convert "+fullsizepath+"/"+imagename+" -resize "+width+" "+resizepath+"/"+imagename)
     #os.system("/usr/bin/convert "+fullsizepath+"/"+imagename.split(".")[0]+".jpg -resize "+width+" "+resizepath+"/"+imagename.split(".")[0]+".jpg")

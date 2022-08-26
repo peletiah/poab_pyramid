@@ -54,7 +54,7 @@ def rss_view(request):
     for log in logs:
         twitter = False
         guid = None
-        print log.infomarker
+        #print log.infomarker
         #q = DBSession.query(Trackpoint).filter(Trackpoint.id==log.infomarker)
         #infomarker=q.one()
         ## ###query for last trackpoint
@@ -81,7 +81,7 @@ def rss_view(request):
             hours = total_minutes / 60
             timespan = str(hours)+'h '+str(mins)+'min'
             rounded_distance=str(total_distance.quantize(Decimal("0.01"), ROUND_HALF_UP))+'km'
-            print timespan, rounded_distance
+            #print timespan, rounded_distance
         else:
             rounded_distance=None
             timespan=None
@@ -103,17 +103,17 @@ def rss_view(request):
             twitter=True
         log_content_display=log.content
         imgidtags=re.findall('\[imgid=[0-9]*\]',log_content_display)
-        print '\n\n'
-        print '\n\n'
-        print imgidtags
-        print log.id
+        #print '\n\n'
+        #print '\n\n'
+        #print imgidtags
+        #print log.id
         for imgidtag in imgidtags:
                 #imageinfo_id=imgidtag[6:-1]
                # print imageinfo_id
                # q = DBSession.query(Imageinfo).filter(Imageinfo.id==imageinfo_id)
                # imageinfo = q.one()
                 image_id=re.search("^\[imgid=(\d{1,})\]$",imgidtag).group(1)
-                print image_id
+                #print image_id
                 #imageinfo_id=imgidtag[6:-1]
                 q = DBSession.query(Image).filter(Image.id==image_id)
                 image = q.one()

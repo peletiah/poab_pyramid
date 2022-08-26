@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="/static/css/ol/ol_common.css" type="text/css">
     <link rel="stylesheet" href="/static/css/ol/ol.css" type="text/css">
     <script src="/static/js/ol/OpenLayers.js"></script>
-    <script src="http://maps.google.com/maps/api/js?v=3&amp;sensor=false"></script>
+    <!--    <script src="https://maps.google.com/maps/api/js?v=3&amp;sensor=false"></script> -->
     <%include file="/track/map.js" />
     <link rel="shortcut icon" href="/static/images/bicycle.ico" />
     <title>poab.org - map</title>
