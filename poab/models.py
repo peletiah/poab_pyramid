@@ -113,8 +113,8 @@ class Author(Base):
         try:
             author = DBSession.query(Author).filter(Author.name == name).one()
             return author
-        except Exception, e:
-            print "Error retrieving author %s: ",e
+        except Exception as e:
+            print("Error retrieving author %s: ",e)
             return None
 
     @classmethod
@@ -174,7 +174,7 @@ class Etappe(Base):
             etappe = DBSession.query(Etappe).filter(Etappe.uuid == uuid).one()
             return etappe
         except Exception, e:
-            print "Error retrieving etappe %s: ",e
+            print("Error retrieving etappe %s: ",e)
             return None
 
     @classmethod
@@ -183,7 +183,7 @@ class Etappe(Base):
             etappen = DBSession.query(Etappe).filter(and_(Etappe.start_date <= date, Etappe.end_date >= date)).all()
             return etappen
         except Exception, e:
-            print "Error retrieving etappen by date: %s ",e
+            print("Error retrieving etappen by date: %s ",e)
             return None
 
 
@@ -218,8 +218,8 @@ class Log(Base):
         try:
             log = DBSession.query(Log).filter(Log.uuid == uuid).one()
             return log
-        except Exception, e:
-            print "Error retrieving log %s: ",e
+        except Exception as e:
+            print("Error retrieving log %s: ",e)
             return None
 
 class LogOld(Base):
@@ -305,8 +305,8 @@ class Image(Base):
         try:
             image = DBSession.query(Image).filter(Image.id == id).one()
             return image
-        except Exception, e:
-            print "Error retrieving extension %s: ",e
+        except Exception as e:
+            print("Error retrieving extension %s: ",e)
             return None
 
     @classmethod
@@ -314,8 +314,8 @@ class Image(Base):
         try:
             image = DBSession.query(Image).filter(Image.uuid == uuid).one()
             return image
-        except exc.NoResultFound,e:
-            print e
+        except exc.NoResultFound as e:
+            print(e)
             return None
 
 
@@ -324,8 +324,8 @@ class Image(Base):
         try:
             image = DBSession.query(Image).filter(Image.hash == hash).one()
             return image
-        except exc.NoResultFound,e:
-            print e
+        except exc.NoResultFound as e:
+            print(e)
             return None
 
 
@@ -334,8 +334,8 @@ class Image(Base):
         try:
             image = DBSession.query(Image).filter(Image.hash_large == hash_large).one()
             return image
-        except exc.NoResultFound,e:
-            print e
+        except exc.NoResultFound as e:
+            print(e)
             return None
 
 
@@ -361,7 +361,7 @@ class FlickrImage(Base):
         self.secret = secret
 
     def reprJSON(self):
-        return dict(id=self.id, image=self.image, farm=self.farm, server=self.server, 
+        return dict(id=self.id, image=self.image, farm=self.farm, server=self.server,
                     photoid=self.photoid, secret=self.secret)
 
 
@@ -386,7 +386,7 @@ class FlickrCredentials(Base):
             flickrcredentials = DBSession.query(FlickrCredentials).filter(FlickrCredentials.author == author_id).one()
             return flickrcredentials
         except Exception, e:
-            print "Error retrieving flickrcredentials %s: ",e
+            print("Error retrieving flickrcredentials %s: ",e)
             return None
 
     @classmethod
@@ -395,7 +395,7 @@ class FlickrCredentials(Base):
             flickrcredentials = DBSession.query(FlickrCredentials).filter(FlickrCredentials.api_key == api_key).one()
             return flickrcredentials
         except Exception, e:
-            print "Error retrieving flickrcredentials %s: ",e
+            print("Error retrieving flickrcredentials %s: ",e)
             return None
 
 
@@ -437,7 +437,7 @@ class Track(Base):
                     end_time=end_time, color=self.color, uuid=self.uuid)
                     #TODO:distance is a decimal, string is not a proper conversion
 
-    
+
     @classmethod
     def get_tracks(self):
         tracks = DBSession.query(Track).all()
@@ -454,7 +454,7 @@ class Track(Base):
             track = DBSession.query(Track).filter(Track.uuid == uuid).one()
             return track
         except Exception, e:
-            print "Error retrieving track %s: ",e
+            print("Error retrieving track %s: ",e)
             return None
 
 
@@ -464,7 +464,7 @@ class Track(Base):
             track = DBSession.query(Track).filter(Track.reduced_trackpoints == reduced_trackpoints).one()
             return track
         except Exception, e:
-            print "Error retrieving track %s: ",e
+            print("Error retrieving track %s: ",e)
             return None
 
 class TrackOld(Base):
@@ -532,8 +532,8 @@ class Trackpoint(Base):
         try:
             trackpoint = DBSession.query(Trackpoint).filter(and_(Trackpoint.latitude == latitude, Trackpoint.longitude == longitude, Trackpoint.timestamp == timestamp)).one()
             return trackpoint
-        except Exception, e:
-            print ("Error retrieving trackpoint by lat(%s), lon(%s), time(%s) :\n %s ") % (latitude, longitude, timestamp, e)
+        except Exception as e:
+            print(("Error retrieving trackpoint by lat(%s), lon(%s), time(%s) :\n %s ") % (latitude, longitude, timestamp, e))
             return None
 
     @classmethod
@@ -541,8 +541,8 @@ class Trackpoint(Base):
         try:
             trackpoint = DBSession.query(Trackpoint).filter(Trackpoint.uuid == uuid).one()
             return trackpoint
-        except Exception, e:
-            print "Error retrieving trackpoint %s: ",e
+        except Exception as e:
+            print("Error retrieving trackpoint %s: ",e)
             return None
 
 class TrackpointOld(Base):

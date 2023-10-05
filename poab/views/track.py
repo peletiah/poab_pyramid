@@ -1,22 +1,17 @@
-from pyramid.response import Response
-from pyramid.httpexceptions import (
-    HTTPFound,
-    HTTPNotFound,
-    )
-from pyramid.view import view_config
+import datetime
+import json
+from json import encoder
 
-from sqlalchemy.exc import DBAPIError
+from pyramid.response import Response
+from pyramid.view import view_config
+from sqlalchemy import and_
 
 from poab.models import (
     DBSession,
     Track,
     Trackpoint
-    )
-from sqlalchemy import and_
+)
 
-from datetime import timedelta
-import time,datetime, json
-from json import encoder
 encoder.FLOAT_REPR = lambda o: format(o, '.7f') #render 7 digits behind the comma with json.dump
 #http://stackoverflow.com/questions/1447287/format-floats-with-standard-json-module
 
@@ -35,13 +30,13 @@ def generate_json_from_tracks(tracks):
             date=row.start_time.strftime('%B %d, %Y')
             color='#'+row.color
             reduced_track = list()
-            #print row.reduced_trackpoints 
+            #print row.reduced_trackpoints
             #print '\n\nROW.REDUCED_TRACKPOINTS\n\n'
             features.append(
                 (dict(
-                type='Feature', 
+                type='Feature',
                 geometry=dict(
-                    type="LineString", 
+                    type="LineString",
                     coordinates=row.reduced_trackpoints
                     ),
                 properties=dict(
@@ -130,6 +125,6 @@ def track_view(request):
         'request': request,
         'jsonlink': jsonlink,
     }
-    
+
 
 

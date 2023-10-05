@@ -1,25 +1,9 @@
+import hashlib
+import json
+from json import encoder
+
 from pyramid.response import Response
-from pyramid.httpexceptions import (
-    HTTPFound,
-    HTTPNotFound,
-    )
-
 from pyramid.view import view_config
-
-from sqlalchemy.exc import DBAPIError
-
-from sqlalchemy import (
-    asc,
-    and_
-)
-
-from poab.helpers.fractions import (
-    Fraction
-)
-
-import markdown
-
-from decimal import Decimal, ROUND_HALF_UP
 
 from poab.models import (
     DBSession,
@@ -30,27 +14,20 @@ from poab.models import (
     Trackpoint,
     Location,
     Image,
-    FlickrImage,
-    Imageinfo,
-    Timezone,
-    Country,
-    Continent
-    )
+    FlickrImage
+)
 
-import hashlib, json
-from json import encoder
 encoder.FLOAT_REPR = lambda o: format(o, '.2f')
 
 from poab.helpers import (
     timetools,
     imagetools,
     filetools,
-    flickrtools,
-    gpxtools
-    )
+    flickrtools
+)
 
-from datetime import datetime, timedelta
-import uuid, re
+from datetime import datetime
+import re
 
 @view_config(route_name='sync', request_param='type=status')
 def itemstatus(request):
@@ -87,7 +64,7 @@ def itemstatus(request):
         payload_uuid = track_json['uuid']
         if track:
             print 'Track already exists on server!'
-            sync_status='was_synced'    
+            sync_status='was_synced'
         else:
             print 'Track not on server'
             sync_status = 'not_synced'
@@ -102,7 +79,7 @@ def logsync(request):
     print log_json
     etappe_json = log_json['etappe']
     #TODO: might be better with dates instead of uuid
-    etappe = Etappe.get_etappe_by_uuid(etappe_json['uuid']) 
+    etappe = Etappe.get_etappe_by_uuid(etappe_json['uuid'])
     if not etappe:
         etappe = Etappe(
                 start_date = etappe_json['start_date'],
@@ -134,12 +111,12 @@ def logsync(request):
         sync_status = 'is_synced'; #Item was not synced before we started
     elif log: #TODO: Updating log, needs last_change comparison and stuff
         print 'Log already exists on server'
-        sync_status = 'was_synced' #Item was already on the server earlier        
+        sync_status = 'was_synced' #Item was already on the server earlier
     else:
         sync_status = 'sync_error' #something is wrong here!
     return Response(json.dumps({'log_id':log_json['id'], 'type':'log', 'item_uuid':log_json['uuid'], 'sync_status':sync_status}))
-    
- 
+
+
 
 
 @view_config(route_name='sync', request_param='type=image')
@@ -174,8 +151,8 @@ def imagesync(request):
         hash_large=hashlib.sha256(open(imgdir+img_large_w+'/'+image_json['name'], 'rb').read()).hexdigest() #TODO
         filehash=hashlib.sha256(open(imgdir+'/'+image_json['name'], 'rb').read()).hexdigest() #TODO
         image = Image(
-                    name = image_json['name'], 
-                    location = imgdir, 
+                    name = image_json['name'],
+                    location = imgdir,
                     title = image_json['title'],
                     comment = image_json['comment'],
                     alt = image_json['alt'],
@@ -197,10 +174,10 @@ def imagesync(request):
         sync_status = 'is_synced'
 
     else:
-        #TODO: So our image is actually in the db - why has this been found earlier in sync?type=status??? 
+        #TODO: So our image is actually in the db - why has this been found earlier in sync?type=status???
         print 'ERROR: Image found in DB, but this should have happened in /sync?type=status'
         sync_status='sync_error'
-    
+
     return Response(json.dumps({'log_id' : log_json['id'], 'type':'image', 'item_uuid':image_json['uuid'], 'sync_status':sync_status})) #Something went very wrong
 
 
@@ -265,7 +242,7 @@ def tracksync(request):
     else:
         print 'sync_error'
         sync_status = 'sync_error'
-    
+
     return Response(json.dumps({'log_id':log_json['id'], 'type':'track', 'item_uuid':track_json['uuid'], 'sync_status':sync_status}))
 
 @view_config(route_name='sync', request_param='interlink=log')
@@ -288,7 +265,7 @@ def interlink_log(request):
     print log_json['tracks']
     if not log_json['tracks']:
         log.infomarker = 3572 #TODO
- 
+
     #Get location for infomarker
     location = Location(name = None, trackpoint_id = None, country_id = None)
     location.name = flickrtools.findplace(log.trackpoint_log_ref.latitude, log.trackpoint_log_ref.longitude, 11, log.author_log_ref)
@@ -297,12 +274,12 @@ def interlink_log(request):
     #print '\n\n\n\n\n\n'+location.name
     print '\n\n\n\n\n'
     DBSession.add(location)
- 
+
     #Link to Images
     for image in log_json['images']:
         image = Image.get_image_by_uuid(image['uuid'])
         log.image.append(image)
- 
+
     content_with_uuid_tags = log.content
     #print content_with_uuid_tags
     img_uuid_list = re.findall("(\[img_uuid=[0-9A-Za-z-]{1,}\])", content_with_uuid_tags)
@@ -349,13 +326,13 @@ def interlink_image(request):
     DBSession.add(image)
     if location: #TODO(Ugly?)
         DBSession.add(location)
-    
+
 
     return Response(json.dumps({'link_status':'linked', 'item_uuid': image.uuid}))
-    
- 
 
- 
+
+
+
 @view_config(route_name='sync', request_param='interlink=track')
 def interlink_track(request):
     track_json = json.loads(request.POST.get('track_json'))
@@ -366,7 +343,7 @@ def interlink_track(request):
     print etappen
     for etappe in etappen:
         print etappe.start_date
-        etappe.track.append(track)    
+        etappe.track.append(track)
     return Response(json.dumps({'link_status':'linked', 'item_uuid': track.uuid}))
-    
- 
+
+
